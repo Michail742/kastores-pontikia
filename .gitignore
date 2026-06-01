@@ -1,0 +1,4 @@
+node_modules/
+server_out.txt
+server_err.txt
+gen-icons.js

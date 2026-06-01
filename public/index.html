@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🦫 Κάστορες &amp; Ποντίκια</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#e94560">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Κάστορες">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#1a1a2e;--surface:#16213e;--card-bg:#0f3460;--card-face:#e94560;
+  --accent:#e94560;--gold:#f5a623;--green:#4caf50;--text:#eee;--muted:#888;
+  --radius:12px;--card-w:60px;--card-h:86px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}
+
+/* ── Screens ── */
+.screen{display:none;width:100%;max-width:480px;padding:20px;flex-direction:column;align-items:center;gap:16px}
+.screen.active{display:flex}
+
+/* ── Lobby ── */
+h1{font-size:1.8rem;text-align:center;color:var(--gold)}
+h1 span{display:block;font-size:1rem;color:var(--muted);font-weight:normal}
+.input-group{display:flex;flex-direction:column;gap:8px;width:100%}
+label{font-size:.85rem;color:var(--muted)}
+input{background:var(--surface);border:2px solid #333;border-radius:8px;color:var(--text);padding:12px 16px;font-size:1rem;width:100%;outline:none}
+input:focus{border-color:var(--accent)}
+input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
+.btn{width:100%;padding:14px;border:none;border-radius:var(--radius);font-size:1rem;font-weight:700;cursor:pointer;transition:transform .1s,opacity .2s}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:var(--surface);color:var(--text);border:2px solid #333}
+.btn-gold{background:var(--gold);color:#111}
+.btn-green{background:var(--green);color:#fff}
+.btn-sm{padding:10px 18px;font-size:.9rem;width:auto}
+.divider{width:100%;text-align:center;color:var(--muted);position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:#333}
+.divider::before{left:0}.divider::after{right:0}
+.error-msg{color:#ff6b6b;font-size:.85rem;text-align:center;min-height:20px}
+.code-display{font-size:3rem;letter-spacing:8px;color:var(--gold);font-weight:900;text-align:center}
+.player-list{width:100%;display:flex;flex-direction:column;gap:8px}
+.player-item{background:var(--surface);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.player-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.waiting-text{color:var(--muted);font-size:.9rem;text-align:center;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── Game board ── */
+#game-screen{display:none;position:fixed;inset:0;background:var(--bg);flex-direction:column;max-width:none;padding:0}
+#game-screen.active{display:flex}
+.game-layout{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;width:100%}
+
+/* Opponents area */
+.opponents-area{flex:0 0 auto;padding:6px 8px;display:flex;flex-direction:column;gap:4px;max-height:45vh;overflow-y:auto}
+.opponent-row{background:var(--surface);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px}
+.opponent-name{font-size:.8rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opponent-cards{display:flex;gap:4px}
+
+/* Center area */
+.center-area{flex:0 0 auto;padding:8px;display:flex;align-items:center;justify-content:space-around;gap:8px;border-top:1px solid #222;border-bottom:1px solid #222}
+.pile{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.pile-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.pile.disabled{opacity:.4;pointer-events:none}
+
+/* Action area */
+.action-area{flex:0 0 auto;padding:6px 8px;min-height:52px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.action-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.drawn-card-area{display:flex;flex-direction:column;align-items:center;gap:6px}
+.drawn-label{font-size:.75rem;color:var(--muted)}
+
+/* Player area */
+.player-area{flex:1;padding:8px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px}
+.player-name-bar{display:flex;justify-content:space-between;align-items:center}
+.player-name{font-weight:700;font-size:.9rem}
+.my-cards{display:flex;gap:8px;justify-content:center}
+
+/* Turn indicator */
+.turn-banner{background:var(--accent);text-align:center;padding:6px;font-size:.85rem;font-weight:700;flex:0 0 auto}
+.turn-banner.my-turn{background:var(--green)}
+
+/* ── Cards ── */
+.card{width:var(--card-w);height:var(--card-h);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1rem;font-weight:900;cursor:pointer;transition:transform .15s,box-shadow .15s;user-select:none;position:relative;flex-shrink:0}
+.card.face-down{background:var(--card-bg);border:2px solid #1e5a8a;color:#1e5a8a}
+.card.face-down::before{content:'🂠';font-size:1.8rem;color:#2a7ab8}
+.card.face-up{background:#fff;color:#222;border:2px solid #ddd}
+.card.face-up.special{background:var(--surface);color:var(--text);border:2px solid var(--accent)}
+.card.face-up.val-9{background:#ffe0e0;color:#c00}
+.card.face-up.val-0{background:#e0ffe0;color:#060}
+.card.selected{transform:translateY(-8px);box-shadow:0 0 16px var(--gold),0 0 32px rgba(245,166,35,.4)}
+.card.selectable:hover{transform:translateY(-4px)}
+.card.drawn-preview{width:70px;height:100px;font-size:1.2rem}
+.card-value{font-size:1.4rem;line-height:1}
+.card-sub{font-size:.55rem;font-weight:500;text-align:center;padding:0 2px}
+.card.small{width:46px;height:66px}
+.card.small .card-value{font-size:1rem}
+.card.small .card-sub{font-size:.45rem}
+.card.small.face-down::before{font-size:1.3rem}
+
+/* ── Overlay / Modal ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.overlay.hidden{display:none}
+.modal{background:var(--surface);border-radius:16px;padding:24px;max-width:340px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.modal h2{font-size:1.3rem;color:var(--gold)}
+.modal p{color:var(--muted);font-size:.9rem;line-height:1.5}
+.score-table{width:100%;border-collapse:collapse}
+.score-table th,.score-table td{padding:8px 10px;text-align:left;font-size:.9rem;border-bottom:1px solid #333}
+.score-table th{color:var(--muted);font-weight:600}
+.score-table .winner-row td{color:var(--gold);font-weight:700}
+
+/* ── Instructions overlay ── */
+.instruction-text{font-size:.95rem;color:var(--text);line-height:1.6;text-align:left;width:100%}
+.instruction-text b{color:var(--gold)}
+
+/* ── Animations ── */
+@keyframes slideInDown{from{transform:translateY(-30px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes bounceIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.animate-in{animation:slideInDown .3s ease}
+.bounce-in{animation:bounceIn .4s ease}
+
+/* ── Swap target highlight ── */
+.card.swap-target{box-shadow:0 0 14px #4caf50,0 0 28px rgba(76,175,80,.3);border-color:#4caf50}
+.card.swap-source{box-shadow:0 0 14px var(--gold);border-color:var(--gold)}
+
+/* ── Status message ── */
+.status-msg{font-size:.8rem;color:var(--muted);text-align:center;min-height:18px;padding:0 8px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOBBY SCREEN ══════════════ -->
+<div id="lobby-screen" class="screen active">
+  <h1>🦫 Κάστορες<span>&amp; Ποντίκια</span></h1>
+  <div class="input-group">
+    <label>Όνομα παίκτη</label>
+    <input type="text" id="player-name" placeholder="Το όνομά σου" maxlength="20">
+  </div>
+  <button class="btn btn-primary" id="btn-create">Δημιουργία Δωματίου</button>
+  <div class="divider">ή</div>
+  <div class="input-group">
+    <label>Κωδικός δωματίου</label>
+    <input type="number" id="room-code-input" placeholder="1234" maxlength="4">
+  </div>
+  <button class="btn btn-secondary" id="btn-join">Είσοδος σε Δωμάτιο</button>
+  <div class="error-msg" id="lobby-error"></div>
+</div>
+
+<!-- ══════════════ WAITING ROOM ══════════════ -->
+<div id="waiting-screen" class="screen">
+  <h1>🦫 Αναμονή<span>Ενημέρωσε τους φίλους σου!</span></h1>
+  <div>Κωδικός δωματίου:</div>
+  <div class="code-display" id="display-code">----</div>
+  <div class="player-list" id="waiting-players"></div>
+  <div class="waiting-text" id="waiting-msg">Αναμονή για περισσότερους παίκτες…</div>
+  <button class="btn btn-gold hidden" id="btn-start">Έναρξη Παιχνιδιού</button>
+  <div class="error-msg" id="waiting-error"></div>
+</div>
+
+<!-- ══════════════ GAME SCREEN ══════════════ -->
+<div id="game-screen" class="screen">
+  <div class="game-layout">
+    <div class="turn-banner" id="turn-banner">Σειρά: —</div>
+    <div class="opponents-area" id="opponents-area"></div>
+    <div class="center-area">
+      <div class="pile" id="deck-pile" title="Πάρε από Στοίβα">
+        <div class="pile-label">Στοίβα</div>
+        <div class="card face-down" id="deck-card"></div>
+        <div style="font-size:.75rem;color:var(--muted)" id="deck-count">—</div>
+      </div>
+      <div class="pile" id="discard-pile" title="Πάρε από Σκάρτα">
+        <div class="pile-label">Σκάρτα</div>
+        <div class="card face-up" id="discard-card"></div>
+      </div>
+    </div>
+    <div class="action-area" id="action-area">
+      <div class="status-msg" id="status-msg"></div>
+      <div class="action-buttons" id="action-buttons"></div>
+    </div>
+    <div class="player-area">
+      <div class="player-name-bar">
+        <div class="player-name" id="my-name-label">Εσύ</div>
+        <div style="font-size:.75rem;color:var(--muted)" id="my-score-label">Σκορ: 0</div>
+      </div>
+      <div class="my-cards" id="my-cards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODALS ══════════════ -->
+<div class="overlay hidden" id="overlay">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+const socket = io();
+let myPlayerId = null;
+let myRoomCode = null;
+let isHost = false;
+let gameState = null;
+let swapSelection = { ownIndex: null };
+let pendingAction = null; // 'takeDiscard' | 'takeDeck' | 'special-peek' | 'special-swap' | 'double'
+
+// ════════════════════════════════════════════════════════════════
+// SCREEN NAV
+// ════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════════════
+// CARD RENDERING
+// ════════════════════════════════════════════════════════════════
+const SPECIAL_LABELS = { swap: ['🔄','Ανταλλαγή'], peek: ['👁️','Ματιά'], double: ['🎲','2 Ευκαιρίες'] };
+
+function cardHTML(card, opts = {}) {
+  const { small, selected, selectable, swapTarget, swapSource } = opts;
+  let cls = 'card';
+  if (small) cls += ' small';
+  if (selected) cls += ' selected';
+  if (selectable) cls += ' selectable';
+  if (swapTarget) cls += ' swap-target';
+  if (swapSource) cls += ' swap-source';
+
+  if (!card || card.type === 'hidden') {
+    return `<div class="${cls} face-down"></div>`;
+  }
+  if (card.type === 'special') {
+    const [emoji, name] = SPECIAL_LABELS[card.name] || ['?','?'];
+    return `<div class="${cls} face-up special"><span class="card-value">${emoji}</span><span class="card-sub">${name}</span></div>`;
+  }
+  // value card
+  let valCls = '';
+  if (card.value === 9) valCls = ' val-9';
+  if (card.value === 0) valCls = ' val-0';
+  return `<div class="${cls} face-up${valCls}"><span class="card-value">${card.value}</span></div>`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// LOBBY EVENTS
+// ════════════════════════════════════════════════════════════════
+function getName() {
+  return document.getElementById('player-name').value.trim();
+}
+function lobbyError(msg) {
+  document.getElementById('lobby-error').textContent = msg;
+}
+function waitingError(msg) {
+  document.getElementById('waiting-error').textContent = msg;
+}
+
+document.getElementById('btn-create').addEventListener('click', () => {
+  const name = getName();
+  if (!name) return lobbyError('Γράψε το όνομά σου.');
+  socket.emit('createRoom', { name });
+});
+
+document.getElementById('btn-join').addEventListener('click', () => {
+  const name = getName();
+  const code = document.getElementById('room-code-input').value.trim();
+  if (!name) return lobbyError('Γράψε το όνομά σου.');
+  if (code.length !== 4) return lobbyError('Ο κωδικός είναι 4 ψηφία.');
+  socket.emit('joinRoom', { code, name });
+});
+
+document.getElementById('btn-start').addEventListener('click', () => {
+  socket.emit('startGame');
+});
+
+socket.on('roomJoined', ({ code, playerId }) => {
+  myPlayerId = playerId;
+  myRoomCode = code;
+  document.getElementById('display-code').textContent = code;
+  showScreen('waiting-screen');
+});
+
+socket.on('lobby', ({ code, players, hostId }) => {
+  isHost = hostId === myPlayerId;
+  const list = document.getElementById('waiting-players');
+  list.innerHTML = players.map(p =>
+    `<div class="player-item"><div class="player-dot"></div><div>${escHtml(p.name)}${p.id === hostId ? ' 👑' : ''}</div></div>`
+  ).join('');
+  const startBtn = document.getElementById('btn-start');
+  if (isHost && players.length >= 2) {
+    startBtn.classList.remove('hidden');
+    document.getElementById('waiting-msg').textContent = 'Πάτα Έναρξη όταν είσαι έτοιμος!';
+  } else {
+    startBtn.classList.add('hidden');
+    document.getElementById('waiting-msg').textContent =
+      isHost ? 'Αναμονή για περισσότερους παίκτες…' : 'Αναμονή για τον host να ξεκινήσει…';
+  }
+});
+
+socket.on('error', ({ message }) => {
+  const active = document.querySelector('.screen.active');
+  if (active?.id === 'lobby-screen') lobbyError(message);
+  else if (active?.id === 'waiting-screen') waitingError(message);
+  else showToast(message);
+});
+
+socket.on('playerLeft', ({ name }) => {
+  showToast(`${name} αποσυνδέθηκε.`);
+});
+
+// ════════════════════════════════════════════════════════════════
+// GAME STATE RENDERING
+// ════════════════════════════════════════════════════════════════
+socket.on('gameState', (state) => {
+  gameState = state;
+  renderGame(state);
+});
+
+function renderGame(state) {
+  showScreen('game-screen');
+
+  const myPlayer = state.players.find(p => p.isMe);
+  const opponents = state.players.filter(p => !p.isMe);
+  const isMyTurn = state.currentPlayerId === myPlayerId;
+  const phase = state.phase;
+
+  // Turn banner
+  const banner = document.getElementById('turn-banner');
+  if (phase === 'peek') {
+    banner.textContent = '👁️ Κοίτα τις 2 ακριανές κάρτες σου!';
+    banner.className = 'turn-banner';
+  } else if (isMyTurn) {
+    banner.textContent = '⭐ Η σειρά σου!';
+    banner.className = 'turn-banner my-turn';
+  } else {
+    const cur = state.players.find(p => p.id === state.currentPlayerId);
+    banner.textContent = `Σειρά: ${cur?.name || '—'}`;
+    banner.className = 'turn-banner';
+  }
+
+  // Deck
+  const deckCard = document.getElementById('deck-card');
+  deckCard.className = 'card face-down';
+  deckCard.innerHTML = '';
+  document.getElementById('deck-count').textContent = `${state.deckCount} κάρτες`;
+
+  // Discard
+  renderDiscardTop(state.discardTop);
+
+  // Opponents
+  renderOpponents(opponents, state);
+
+  // My cards
+  renderMyCards(myPlayer, state);
+
+  // Actions
+  renderActions(state, isMyTurn, myPlayer);
+
+  // Scoring modal
+  if (phase === 'scoring') showScoringModal(state);
+  else if (phase === 'gameover') showGameOverModal(state);
+  else closeModal();
+
+  // Peek phase modal
+  if (phase === 'peek') showPeekModal(myPlayer);
+}
+
+function renderDiscardTop(card) {
+  const pile = document.getElementById('discard-pile');
+  let el = pile.querySelector('.card');
+  if (!el) {
+    el = document.createElement('div');
+    pile.appendChild(el);
+  }
+  if (!card) {
+    el.className = 'card face-up';
+    el.innerHTML = '<span style="color:#555;font-size:.7rem">κενό</span>';
+    return;
+  }
+  el.className = 'card face-up' + (card.type === 'special' ? ' special' : card.value === 9 ? ' val-9' : card.value === 0 ? ' val-0' : '');
+  if (card.type === 'special') {
+    const [e, n] = SPECIAL_LABELS[card.name] || ['?','?'];
+    el.innerHTML = `<span class="card-value">${e}</span><span class="card-sub">${n}</span>`;
+  } else {
+    el.innerHTML = `<span class="card-value">${card.value}</span>`;
+  }
+}
+
+function renderOpponents(opponents, state) {
+  const area = document.getElementById('opponents-area');
+  area.innerHTML = opponents.map(p => {
+    const isCur = p.id === state.currentPlayerId;
+    const cards = p.cards.map((c,i) =>
+      cardHTML(c, { small: true })
+    ).join('');
+    return `<div class="opponent-row${isCur ? ' animate-in' : ''}" style="${isCur ? 'border:1px solid var(--accent)' : ''}">
+      <div class="opponent-name">${isCur ? '▶ ' : ''}${escHtml(p.name)}<span style="color:var(--muted);font-size:.7rem"> (${p.totalScore})</span></div>
+      <div class="opponent-cards">${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMyCards(player, state) {
+  const area = document.getElementById('my-cards');
+  const isMyTurn = state.currentPlayerId === myPlayerId;
+  const actionState = state.actionState;
+  const phase = state.phase;
+
+  area.innerHTML = player.cards.map((c, i) => {
+    let selected = false, selectable = false, swapSource = false;
+    if (isMyTurn) {
+      if (actionState === 'swapOwn' || actionState === 'drawn') selectable = true;
+      if (actionState === 'special-peek') selectable = true;
+      if (actionState === 'special-swap') { selectable = true; swapSource = (swapSelection.ownIndex === i); }
+      if (actionState === 'double' || actionState === 'double2') selectable = true;
+    }
+    if (phase === 'peek') selectable = true;
+    return `<div data-mycard="${i}">${cardHTML(c, { selected, selectable, swapSource })}</div>`;
+  }).join('');
+
+  // My name & score
+  document.getElementById('my-name-label').textContent = escHtml(player.name);
+  document.getElementById('my-score-label').textContent = `Σκορ: ${player.totalScore}`;
+
+  // Tap handlers
+  area.querySelectorAll('[data-mycard]').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.mycard);
+      handleMyCardTap(idx, state);
+    });
+  });
+}
+
+function handleMyCardTap(idx, state) {
+  const actionState = state.actionState;
+  const phase = state.phase;
+  const isMyTurn = state.currentPlayerId === myPlayerId;
+
+  if (phase === 'peek') {
+    socket.emit('confirmPeek');
+    return;
+  }
+  if (!isMyTurn) return;
+
+  if (actionState === 'swapOwn') {
+    socket.emit('swapWithOwn', { cardIndex: idx });
+  } else if (actionState === 'drawn' && state.drawnCard?.type !== 'special') {
+    socket.emit('swapWithOwn', { cardIndex: idx });
+  } else if (actionState === 'special-peek') {
+    socket.emit('peekOwnCard', { cardIndex: idx });
+  } else if (actionState === 'special-swap') {
+    swapSelection.ownIndex = idx;
+    showSwapTargetSelection(state, idx);
+  } else if (actionState === 'double' || actionState === 'double2') {
+    if (state.drawnCard?.type !== 'special') socket.emit('swapWithOwn', { cardIndex: idx });
+  }
+}
+
+function showSwapTargetSelection(state, ownIdx) {
+  // Show modal to pick opponent + their card index
+  const opponents = state.players.filter(p => !p.isMe);
+  if (opponents.length === 0) return;
+
+  let html = `<h2>🔄 Ανταλλαγή</h2><p>Επέλεξε κάρτα αντιπάλου</p>`;
+  opponents.forEach(opp => {
+    html += `<div style="margin:10px 0"><div style="font-size:.85rem;color:var(--muted);margin-bottom:6px">${escHtml(opp.name)}</div>
+    <div style="display:flex;gap:8px;justify-content:center">`;
+    opp.cards.forEach((c, ci) => {
+      html += `<div data-swap-target="${opp.id}" data-swap-idx="${ci}" style="cursor:pointer">${cardHTML(c, { small: true, swapTarget: true })}</div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += `<button class="btn btn-secondary btn-sm" id="cancel-swap">Ακύρωση</button>`;
+
+  showModal(html);
+  document.getElementById('cancel-swap')?.addEventListener('click', () => { swapSelection = {}; closeModal(); });
+  document.querySelectorAll('[data-swap-target]').forEach(el => {
+    el.addEventListener('click', () => {
+      const targetId = el.dataset.swapTarget;
+      const targetIndex = parseInt(el.dataset.swapIdx);
+      socket.emit('selectSwap', { ownIndex: ownIdx, targetId, targetIndex });
+      swapSelection = {};
+      closeModal();
+    });
+  });
+}
+
+function renderActions(state, isMyTurn, myPlayer) {
+  const area = document.getElementById('action-buttons');
+  const statusEl = document.getElementById('status-msg');
+  const actionState = state.actionState;
+  area.innerHTML = '';
+
+  if (!isMyTurn || state.phase === 'peek' || state.phase === 'scoring' || state.phase === 'gameover') {
+    statusEl.textContent = isMyTurn ? '' : `Σειρά: ${state.players.find(p=>p.id===state.currentPlayerId)?.name || '—'}`;
+    return;
+  }
+
+  if (state.phase === 'lastRound') {
+    statusEl.textContent = '⚠️ Τελευταίος γύρος — παίξε τη σειρά σου!';
+  } else {
+    statusEl.textContent = '';
+  }
+
+  if (actionState === 'choose') {
+    const discardTop = state.discardTop;
+    const canTakeDiscard = discardTop && discardTop.type !== 'special';
+    area.innerHTML = `
+      <button class="btn btn-secondary btn-sm" id="btn-take-deck">📦 Στοίβα</button>
+      <button class="btn btn-secondary btn-sm${canTakeDiscard ? '' : ' pile disabled'}" id="btn-take-discard"${canTakeDiscard ? '' : ' disabled'}>♻️ Σκάρτα</button>
+      ${state.phase === 'playing' && state.players.every(p => p.playedThisRound) ? '<button class="btn btn-primary btn-sm" id="btn-call-end">🏁 Τέλος!</button>' : ''}
+    `;
+    document.getElementById('btn-take-deck')?.addEventListener('click', () => socket.emit('takeDeck'));
+    document.getElementById('btn-take-discard')?.addEventListener('click', () => { if(canTakeDiscard) socket.emit('takeDiscard'); });
+    document.getElementById('btn-call-end')?.addEventListener('click', () => socket.emit('callEnd'));
+
+  } else if (actionState === 'drawn') {
+    renderDrawnCardActions(state, area);
+  } else if (actionState === 'swapOwn') {
+    statusEl.textContent = '👆 Tap μια κάρτα σου για ανταλλαγή';
+  } else if (actionState === 'special-peek') {
+    statusEl.textContent = '👆 Tap μια κάρτα σου να τη δεις';
+  } else if (actionState === 'peeking') {
+    statusEl.textContent = '👁️ Κοίτα! Κλείνει αυτόματα…';
+  } else if (actionState === 'special-swap') {
+    statusEl.textContent = '👆 Tap μια κάρτα σου για ανταλλαγή';
+  } else if (actionState === 'double') {
+    renderDrawnCardActions(state, area, 'double');
+  } else if (actionState === 'double2') {
+    renderDrawnCardActions(state, area, 'double2');
+  }
+}
+
+function renderDrawnCardActions(state, area, mode) {
+  if (!state.drawnCard) return;
+  const card = state.drawnCard;
+  const isSpecial = card.type === 'special';
+  const isDouble2 = mode === 'double2';
+
+  let drawnHtml = `<div class="drawn-card-area">
+    <div class="drawn-label">Κάρτα που τράβηξες:</div>
+    ${cardHTML(card, { small: false })}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px">`;
+
+  if (!isSpecial) {
+    drawnHtml += `<button class="btn btn-secondary btn-sm" id="btn-swap-own">🔃 Ανταλλαγή</button>`;
+    if (!isDouble2) drawnHtml += `<button class="btn btn-secondary btn-sm" id="btn-discard-drawn">🗑️ Πέταξε</button>`;
+  } else {
+    drawnHtml += `<button class="btn btn-primary btn-sm" id="btn-play-special">▶ Παίξε</button>`;
+    if (!isDouble2) drawnHtml += `<button class="btn btn-secondary btn-sm" id="btn-discard-drawn">🗑️ Πέταξε</button>`;
+  }
+
+  if (mode === 'double' && !isDouble2) {
+    drawnHtml += `<button class="btn btn-secondary btn-sm" id="btn-discard-double">↩ 2η ευκαιρία</button>`;
+  }
+
+  drawnHtml += `</div></div>`;
+  area.innerHTML = drawnHtml;
+
+  document.getElementById('btn-swap-own')?.addEventListener('click', () => {
+    document.getElementById('status-msg').textContent = '👆 Tap μια κάρτα σου';
+  });
+  document.getElementById('btn-discard-drawn')?.addEventListener('click', () => socket.emit('discardDrawn'));
+  document.getElementById('btn-play-special')?.addEventListener('click', () => socket.emit('playSpecial'));
+  document.getElementById('btn-discard-double')?.addEventListener('click', () => socket.emit('discardDouble'));
+}
+
+// ════════════════════════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════════════════════════
+function showModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('overlay').classList.add('hidden');
+}
+
+function showPeekModal(myPlayer) {
+  const outerCards = [myPlayer.cards[0], myPlayer.cards[3]];
+  const html = `<h2>👁️ Κοίτα τις κάρτες σου</h2>
+    <p>Κοίτα τις 2 ακριανές κάρτες σου (1η και 4η). Θυμήσου τες!</p>
+    <div style="display:flex;gap:16px;margin:8px 0">
+      ${cardHTML(outerCards[0])} ${cardHTML(outerCards[1])}
+    </div>
+    <p style="font-size:.8rem;color:var(--muted)">Μόνο εσύ τις βλέπεις.</p>
+    <button class="btn btn-primary" id="btn-confirm-peek">Είδα! Κλείσιμο 👍</button>`;
+  showModal(html);
+  document.getElementById('btn-confirm-peek')?.addEventListener('click', () => {
+    socket.emit('confirmPeek');
+    closeModal();
+  });
+}
+
+function showScoringModal(state) {
+  const scores = state.scores;
+  if (!scores) return;
+  const roundWinner = state.roundWinner;
+  let rows = scores.map(s =>
+    `<tr${s.id === roundWinner?.id ? ' class="winner-row"' : ''}><td>${escHtml(s.name)}</td><td>${s.score}</td><td>${s.totalScore}</td></tr>`
+  ).join('');
+  const html = `<h2>🃏 Τέλος Γύρου ${state.round}/${state.totalRounds}</h2>
+    <table class="score-table"><thead><tr><th>Παίκτης</th><th>Γύρος</th><th>Σύνολο</th></tr></thead><tbody>${rows}</tbody></table>
+    ${isHost ? `<button class="btn btn-gold" id="btn-next-round">Επόμενη Παρτίδα ▶</button>` : '<p class="waiting-text">Αναμονή για τον host…</p>'}`;
+  showModal(html);
+  document.getElementById('btn-next-round')?.addEventListener('click', () => socket.emit('nextRound'));
+}
+
+function showGameOverModal(state) {
+  const scores = state.scores;
+  if (!scores) return;
+  const sorted = [...scores].sort((a, b) => a.totalScore - b.totalScore);
+  const winner = state.winner;
+  let rows = sorted.map((s, i) =>
+    `<tr${s.id === winner?.id ? ' class="winner-row"' : ''}><td>${i + 1}. ${escHtml(s.name)}</td><td>${s.totalScore}</td></tr>`
+  ).join('');
+  const html = `<h2>🏆 Τέλος Παιχνιδιού!</h2>
+    <p>Νικητής: <b style="color:var(--gold)">${escHtml(winner?.name || '—')}</b> με ${winner?.totalScore} πόντους!</p>
+    <table class="score-table"><thead><tr><th>Παίκτης</th><th>Σύνολο</th></tr></thead><tbody>${rows}</tbody></table>
+    <button class="btn btn-primary" id="btn-new-game">Νέο Παιχνίδι</button>`;
+  showModal(html);
+  document.getElementById('btn-new-game')?.addEventListener('click', () => location.reload());
+}
+
+// ════════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════════
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:.85rem;z-index:200;transition:opacity .3s';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.style.opacity = '0', 3000);
+}
+
+// Register service worker for PWA installability
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close overlay on backdrop click (not modal)
+document.getElementById('overlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('overlay')) {
+    if (gameState?.phase !== 'peek') closeModal();
+  }
+});
+</script>
+</body>
+</html>
