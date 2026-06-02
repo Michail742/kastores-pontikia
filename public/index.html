@@ -160,6 +160,27 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 
 /* ── Status message ── */
 .status-msg{font-size:.8rem;color:var(--muted);text-align:center;min-height:18px;padding:0 8px}
+
+/* ── Drawn card bottom sheet ── */
+.sheet-bd{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:240;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-bd.show{opacity:1;pointer-events:auto}
+.drawn-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(110%);width:100%;max-width:480px;background:#16213e;border-radius:20px 20px 0 0;padding:18px 16px 30px;z-index:250;display:flex;flex-direction:column;align-items:center;gap:14px;border-top:2px solid rgba(233,69,96,.4);transition:transform .34s cubic-bezier(.34,1.15,.64,1);box-shadow:0 -12px 48px rgba(0,0,0,.7)}
+.drawn-sheet.open{transform:translateX(-50%) translateY(0)}
+.drawn-sheet-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;text-align:center}
+.drawn-sheet-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
+.drawn-sheet-hint{font-size:.85rem;color:var(--text);text-align:center;padding:4px 0}
+.card.card-xl{width:80px;height:116px}
+.card.card-xl .card-value{font-size:1.9rem}
+.card.card-xl .card-sub{font-size:.62rem}
+.card.card-xl.face-down::before{font-size:2.2rem}
+
+/* ── Flying card ── */
+.card-fly{position:fixed;z-index:500;pointer-events:none;border-radius:8px;background:var(--card-bg);border:2px solid #1e5a8a;display:flex;align-items:center;justify-content:center}
+.card-fly::before{content:'🂠';font-size:1.8rem;color:#2a7ab8}
+
+/* ── Cards pulsing for selection ── */
+@keyframes selectPulse{0%,100%{transform:translateY(0);box-shadow:none}50%{transform:translateY(-7px);box-shadow:0 0 16px var(--gold),0 0 32px rgba(245,166,35,.3)}}
+.need-select .card.selectable{animation:selectPulse .8s ease infinite}
 </style>
 </head>
 <body>
@@ -230,6 +251,14 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
   <div class="modal" id="modal-content"></div>
 </div>
 
+<!-- ══════════════ DRAWN CARD SHEET ══════════════ -->
+<div id="sheet-bd" class="sheet-bd"></div>
+<div id="drawn-sheet" class="drawn-sheet">
+  <div class="drawn-sheet-label" id="drawn-sheet-label">Κάρτα που τράβηξες</div>
+  <div id="drawn-sheet-card-wrap"></div>
+  <div class="drawn-sheet-btns" id="drawn-sheet-btns"></div>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════════
@@ -243,6 +272,7 @@ let gameState = null;
 let swapSelection = { ownIndex: null };
 let pendingAction = null; // 'takeDiscard' | 'takeDeck' | 'special-peek' | 'special-swap' | 'double'
 let prevPhase = null;
+let prevActionState = null;
 let pendingAnim = null; // set by 'action' event, consumed by next render
 
 // ════════════════════════════════════════════════════════════════
@@ -401,6 +431,24 @@ function renderGame(state) {
     banner.textContent = newBannerText;
     triggerAnim('turn-banner', 'anim-banner');
   }
+
+  // ── Drawn card sheet management ──
+  const sheetShouldShow = isMyTurn && DRAWN_STATES.includes(state.actionState) && state.drawnCard;
+  const wasDrawnState = DRAWN_STATES.includes(prevActionState || '');
+  const justEnteredDrawn = sheetShouldShow && !wasDrawnState;
+  const drawnStateChanged = sheetShouldShow && state.actionState !== prevActionState;
+
+  if (sheetShouldShow) {
+    if (justEnteredDrawn) {
+      const srcId = pendingAnim?.type === 'drawDiscard' ? 'discard-pile' : 'deck-card';
+      flyCard(srcId, () => openDrawnSheet(state));
+    } else if (drawnStateChanged) {
+      openDrawnSheet(state); // e.g. double → double2
+    }
+  } else {
+    closeDrawnSheet();
+  }
+  prevActionState = state.actionState;
 
   // Deck
   const deckCard = document.getElementById('deck-card');
@@ -587,28 +635,23 @@ function renderActions(state, isMyTurn, myPlayer) {
     const discardTop = state.discardTop;
     const canTakeDiscard = discardTop && discardTop.type !== 'special';
     area.innerHTML = `
-      <button class="btn btn-secondary btn-sm" id="btn-take-deck">🃏 Τράβα κάρτα</button>
-      <button class="btn btn-secondary btn-sm${canTakeDiscard ? '' : ' pile disabled'}" id="btn-take-discard"${canTakeDiscard ? '' : ' disabled'}>♻️ Σκάρτα</button>
-      ${state.phase === 'playing' && state.players.every(p => p.playedThisRound) ? '<button class="btn btn-primary btn-sm" id="btn-call-end">🏁 Τέλος!</button>' : ''}
+      <button class="btn btn-primary btn-sm" id="btn-take-deck">🃏 Τράβα κάρτα</button>
+      <button class="btn btn-secondary btn-sm${canTakeDiscard ? '' : ' pile disabled'}" id="btn-take-discard"${canTakeDiscard ? '' : ' disabled'}>♻️ Από σκάρτα</button>
+      ${state.phase === 'playing' && state.players.every(p => p.playedThisRound) ? '<button class="btn btn-gold btn-sm" id="btn-call-end">🏁 Τέλος!</button>' : ''}
     `;
     document.getElementById('btn-take-deck')?.addEventListener('click', () => socket.emit('takeDeck'));
     document.getElementById('btn-take-discard')?.addEventListener('click', () => { if(canTakeDiscard) socket.emit('takeDiscard'); });
     document.getElementById('btn-call-end')?.addEventListener('click', () => socket.emit('callEnd'));
 
-  } else if (actionState === 'drawn') {
-    renderDrawnCardActions(state, area);
-  } else if (actionState === 'swapOwn') {
-    statusEl.textContent = '👆 Tap μια κάρτα σου για ανταλλαγή';
+  } else if (DRAWN_STATES.includes(actionState)) {
+    // Bottom sheet handles drawn states — just show minimal hint if sheet was dismissed
+    statusEl.textContent = '';
   } else if (actionState === 'special-peek') {
     statusEl.textContent = '👆 Tap μια κάρτα σου να τη δεις';
   } else if (actionState === 'peeking') {
     statusEl.textContent = '👁️ Κοίτα! Κλείνει αυτόματα…';
   } else if (actionState === 'special-swap') {
     statusEl.textContent = '👆 Tap μια κάρτα σου για ανταλλαγή';
-  } else if (actionState === 'double') {
-    renderDrawnCardActions(state, area, 'double');
-  } else if (actionState === 'double2') {
-    renderDrawnCardActions(state, area, 'double2');
   }
 }
 
@@ -701,6 +744,90 @@ function showGameOverModal(state) {
     <button class="btn btn-primary" id="btn-new-game">Νέο Παιχνίδι</button>`;
   showModal(html);
   document.getElementById('btn-new-game')?.addEventListener('click', () => location.reload());
+}
+
+// ════════════════════════════════════════════════════════════════
+// DRAWN CARD SHEET
+// ════════════════════════════════════════════════════════════════
+const DRAWN_STATES = ['drawn','swapOwn','double','double2'];
+
+function flyCard(sourceId, cb) {
+  let fromEl = document.getElementById(sourceId) || document.querySelector('#' + sourceId + ' .card');
+  if (!fromEl) { cb?.(); return; }
+  const fr = fromEl.getBoundingClientRect();
+  if (!fr.width) { cb?.(); return; }
+  const tw = 72, th = 104;
+  const tx = Math.round(window.innerWidth / 2 - tw / 2);
+  const ty = Math.round(window.innerHeight * 0.38 - th / 2);
+  const fly = document.createElement('div');
+  fly.className = 'card-fly';
+  fly.style.cssText = `left:${fr.left}px;top:${fr.top}px;width:${fr.width}px;height:${fr.height}px;`;
+  document.body.appendChild(fly);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    fly.style.cssText += `transition:left .3s ease,top .3s ease,width .28s ease,height .28s ease;left:${tx}px;top:${ty}px;width:${tw}px;height:${th}px;`;
+  }));
+  setTimeout(() => { fly.remove(); cb?.(); }, 380);
+}
+
+function openDrawnSheet(state) {
+  const card = state.drawnCard;
+  if (!card) { closeDrawnSheet(); return; }
+  const as = state.actionState;
+  const isSpecial = card.type === 'special';
+  const isDouble2 = as === 'double2';
+  const isSwapOwn = as === 'swapOwn';
+
+  const labelMap = {
+    drawn: '🃏 Κάρτα που τράβηξες',
+    swapOwn: '♻️ Πήρες από τα σκάρτα',
+    double: '🎲 1η κάρτα — 2 Ευκαιρίες',
+    double2: '🎲 2η κάρτα — πρέπει να τη χρησιμοποιήσεις!',
+  };
+  document.getElementById('drawn-sheet-label').textContent = labelMap[as] || '🃏';
+
+  const wrap = document.getElementById('drawn-sheet-card-wrap');
+  wrap.innerHTML = cardHTML(card, {});
+  const cardEl = wrap.querySelector('.card');
+  if (cardEl) cardEl.classList.add('card-xl');
+
+  let btns = '';
+  if (isSwapOwn) {
+    btns = `<div class="drawn-sheet-hint">👆 Tap μια κάρτα σου παρακάτω</div>
+            <button class="btn btn-gold" id="sh-pick">Επιλογή κάρτας</button>`;
+  } else if (!isSpecial) {
+    btns = `<button class="btn btn-gold btn-sm" id="sh-swap">🔃 Αντικατάστησε</button>`;
+    if (!isDouble2) btns += `<button class="btn btn-secondary btn-sm" id="sh-discard">🗑️ Πέταξε</button>`;
+    if (as === 'double') btns += `<button class="btn btn-secondary btn-sm" id="sh-double">↩ 2η ευκαιρία</button>`;
+  } else {
+    const sName = SPECIAL_LABELS[card.name]?.[1] || card.name;
+    btns = `<button class="btn btn-primary btn-sm" id="sh-special">▶ Παίξε: ${sName}</button>`;
+    if (!isDouble2) btns += `<button class="btn btn-secondary btn-sm" id="sh-discard">🗑️ Πέταξε</button>`;
+    if (as === 'double') btns += `<button class="btn btn-secondary btn-sm" id="sh-double">↩ 2η ευκαιρία</button>`;
+  }
+  document.getElementById('drawn-sheet-btns').innerHTML = btns;
+
+  const closeAndPrompt = () => {
+    closeDrawnSheet();
+    document.getElementById('status-msg').textContent = '👆 Tap μια κάρτα σου';
+    document.getElementById('my-cards').classList.add('need-select');
+  };
+  document.getElementById('sh-pick')?.addEventListener('click', closeAndPrompt);
+  document.getElementById('sh-swap')?.addEventListener('click', closeAndPrompt);
+  document.getElementById('sh-discard')?.addEventListener('click', () => { closeDrawnSheet(); socket.emit('discardDrawn'); });
+  document.getElementById('sh-special')?.addEventListener('click', () => { closeDrawnSheet(); socket.emit('playSpecial'); });
+  document.getElementById('sh-double')?.addEventListener('click', () => socket.emit('discardDouble'));
+
+  const bd = document.getElementById('sheet-bd');
+  bd.onclick = isSwapOwn ? closeAndPrompt : null;
+
+  document.getElementById('drawn-sheet').classList.add('open');
+  bd.classList.add('show');
+}
+
+function closeDrawnSheet() {
+  document.getElementById('drawn-sheet').classList.remove('open');
+  document.getElementById('sheet-bd').classList.remove('show');
+  document.getElementById('my-cards').classList.remove('need-select');
 }
 
 // ════════════════════════════════════════════════════════════════
