@@ -116,6 +116,22 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .instruction-text{font-size:.95rem;color:var(--text);line-height:1.6;text-align:left;width:100%}
 .instruction-text b{color:var(--gold)}
 
+/* ── Rules modal ── */
+.rules-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.rules-overlay.hidden{display:none}
+.rules-sheet{background:#16213e;width:100%;max-width:480px;max-height:90vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;border-top:2px solid rgba(233,69,96,.3)}
+.rules-header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.rules-header h2{font-size:1.05rem;color:var(--gold);margin:0}
+.rules-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rules-body{overflow-y:auto;padding:16px 20px 32px;display:flex;flex-direction:column;gap:20px;-webkit-overflow-scrolling:touch}
+.rules-section{display:flex;flex-direction:column;gap:8px}
+.rules-section h3{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin:0}
+.rules-section p,.rules-section li{font-size:.88rem;color:#ccc;line-height:1.6;margin:0}
+.rules-section ul{padding-left:16px;display:flex;flex-direction:column;gap:4px}
+.rules-section b{color:#fff}
+.rules-card-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border-radius:8px;padding:6px 10px;font-size:.85rem;color:#fff}
+.rules-cards-row{display:flex;flex-wrap:wrap;gap:8px}
+
 /* ── Animations ── */
 @keyframes slideInDown{from{transform:translateY(-30px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes bounceIn{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
@@ -211,6 +227,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
     <button class="btn btn-secondary" id="btn-join">Είσοδος σε Δωμάτιο</button>
   </div>
 
+  <button class="btn btn-secondary" id="btn-rules" style="opacity:.7;font-size:.85rem;padding:10px">📖 Οδηγίες Παιχνιδιού</button>
   <div class="error-msg" id="lobby-error"></div>
 </div>
 
@@ -261,6 +278,88 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 <!-- ══════════════ MODALS ══════════════ -->
 <div class="overlay hidden" id="overlay">
   <div class="modal" id="modal-content"></div>
+</div>
+
+<!-- ══════════════ RULES MODAL ══════════════ -->
+<div id="rules-overlay" class="rules-overlay hidden">
+  <div class="rules-sheet">
+    <div class="rules-header">
+      <h2>📖 Οδηγίες Παιχνιδιού</h2>
+      <button class="rules-close" id="rules-close">✕</button>
+    </div>
+    <div class="rules-body">
+
+      <div class="rules-section">
+        <h3>Στόχος</h3>
+        <p>Κάθε παίκτης έχει <b>4 κλειστές κάρτες</b>. Στόχος είναι να έχεις κάρτες <b>μικρής αξίας</b>. Κερδίζει ο παίκτης με το <b>μικρότερο σύνολο</b> μετά από όλες τις παρτίδες.</p>
+      </div>
+
+      <div class="rules-section">
+        <h3>Έναρξη</h3>
+        <ul>
+          <li>Κάθε παίκτης παίρνει <b>4 κλειστές κάρτες</b> — χωρίς να τις δει.</li>
+          <li>Στην αρχή <b>κρυφοκοιτάς μόνο τις 2 ακριανές</b> κάρτες σου (1η & 4η). Θυμήσου τες!</li>
+          <li>Οι 2 μεσαίες κάρτες <b>δεν κοιτάζονται</b> καθόλου στην αρχή.</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <h3>Σειρά σου — 2 επιλογές</h3>
+        <p><b>⚡ Α — Από τα σκάρτα</b></p>
+        <ul>
+          <li>Παίρνεις την ανοιχτή κάρτα στην κορυφή των σκάρτων.</li>
+          <li>Την <b>ανταλλάζεις</b> με μία από τις 4 κάρτες σου (χωρίς να δεις αυτή που παίρνεις πίσω).</li>
+          <li>⚠️ Αν η κορυφή είναι <b>ειδική κάρτα</b>, δεν μπορείς να την πάρεις έτσι.</li>
+        </ul>
+        <p style="margin-top:8px"><b>⚡ Β — Από τη στοίβα</b></p>
+        <ul>
+          <li>Τραβάς κλειστή κάρτα και την κοιτάς.</li>
+          <li><b>Την ανταλλάζεις</b> με μία από τις 4 κάρτες σου.</li>
+          <li><b>Την πετάς</b> στα σκάρτα αν δεν σου αρέσει.</li>
+          <li>Αν είναι <b>ειδική κάρτα</b>: μπορείς να την παίξεις ή να την πετάξεις.</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <h3>Ειδικές κάρτες</h3>
+        <div class="rules-cards-row">
+          <div class="rules-card-chip">🔄 <span><b>Ανταλλαγή</b> — Αντάλλαξε κρυφά μία κάρτα σου με κάρτα αντιπάλου</span></div>
+          <div class="rules-card-chip">👁️ <span><b>Ματιά</b> — Κοίτα κρυφά μία από τις 4 κάρτες σου</span></div>
+          <div class="rules-card-chip">🎲 <span><b>2 Ευκαιρίες</b> — Κοίτα την κορυφή της στοίβας. Αν δεν σου αρέσει, την πετάς και <b>πρέπει</b> να χρησιμοποιήσεις την επόμενη</span></div>
+        </div>
+        <p style="margin-top:4px;font-size:.8rem;color:#888">Ειδικές κάρτες που βρεθούν στο τέλος αντικαθίστανται αυτόματα με κάρτα αξίας.</p>
+      </div>
+
+      <div class="rules-section">
+        <h3>Τέλος παρτίδας</h3>
+        <ul>
+          <li>Πατάς <b>🏁 Τέλος!</b> στο τέλος της σειράς σου αν πιστεύεις ότι έχεις χαμηλό σύνολο.</li>
+          <li>⚠️ Μπορείς να πατήσεις Τέλος μόνο αν <b>έχουν παίξει όλοι τουλάχιστον μία φορά</b>.</li>
+          <li>Όλοι οι άλλοι παίζουν <b>μία τελευταία φορά</b> — εσύ δεν ξαναπαίζεις.</li>
+          <li>Μετά αποκαλύπτονται όλες οι κάρτες και μετράμε πόντους.</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <h3>Βαθμολογία & νικητής</h3>
+        <ul>
+          <li>Κάθε κάρτα μετράει την <b>αξία της</b> (0–9). Ειδικές = 0.</li>
+          <li>Το παιχνίδι παίζεται για <b>τόσες παρτίδες όσοι οι παίκτες</b> (2 παίκτες = 4 παρτίδες).</li>
+          <li>Νικητής ο παίκτης με το <b>μικρότερο συνολικό σκορ</b>.</li>
+        </ul>
+      </div>
+
+      <div class="rules-section">
+        <h3>Θυμήσου!</h3>
+        <ul>
+          <li>Οι κάρτες <b>κινούνται συνέχεια</b> — θυμήσου τι έχεις!</li>
+          <li><b>Δεν κοιτάς</b> τις κάρτες σου κατά τη διάρκεια (εκτός με Ματιά).</li>
+          <li>Κάρτα <b>0</b> = τέλεια κάρτα. Κάρτα <b>9</b> = κακή κάρτα.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <!-- ══════════════ DRAWN CARD SHEET ══════════════ -->
@@ -957,6 +1056,18 @@ if ('serviceWorker' in navigator) {
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// Rules modal
+document.getElementById('btn-rules').addEventListener('click', () => {
+  document.getElementById('rules-overlay').classList.remove('hidden');
+});
+document.getElementById('rules-close').addEventListener('click', () => {
+  document.getElementById('rules-overlay').classList.add('hidden');
+});
+document.getElementById('rules-overlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('rules-overlay'))
+    document.getElementById('rules-overlay').classList.add('hidden');
+});
 
 // Exit button
 document.getElementById('btn-exit').addEventListener('click', () => {
