@@ -584,7 +584,7 @@ function renderActions(state, isMyTurn, myPlayer) {
     const discardTop = state.discardTop;
     const canTakeDiscard = discardTop && discardTop.type !== 'special';
     area.innerHTML = `
-      <button class="btn btn-secondary btn-sm" id="btn-take-deck">📦 Στοίβα</button>
+      <button class="btn btn-secondary btn-sm" id="btn-take-deck">🃏 Τράβα κάρτα</button>
       <button class="btn btn-secondary btn-sm${canTakeDiscard ? '' : ' pile disabled'}" id="btn-take-discard"${canTakeDiscard ? '' : ' disabled'}>♻️ Σκάρτα</button>
       ${state.phase === 'playing' && state.players.every(p => p.playedThisRound) ? '<button class="btn btn-primary btn-sm" id="btn-call-end">🏁 Τέλος!</button>' : ''}
     `;
