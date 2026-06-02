@@ -122,6 +122,38 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .animate-in{animation:slideInDown .3s ease}
 .bounce-in{animation:bounceIn .4s ease}
 
+/* Action notification */
+.action-notif{position:fixed;top:52px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(15,15,30,.92);color:#fff;padding:7px 18px;border-radius:20px;font-size:.82rem;z-index:400;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap;max-width:88vw;text-align:center;border:1px solid rgba(255,255,255,.12)}
+.action-notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Deck pulse when drawn */
+@keyframes deckPulse{0%{transform:scale(1)}40%{transform:scale(1.12);box-shadow:0 0 22px var(--accent)}100%{transform:scale(1);box-shadow:none}}
+.anim-deck{animation:deckPulse .38s ease}
+
+/* Discard: new card slides in */
+@keyframes discardIn{0%{transform:translateY(-18px) scale(.85);opacity:0}70%{transform:translateY(2px) scale(1.04)}100%{transform:translateY(0) scale(1);opacity:1}}
+.anim-discard{animation:discardIn .32s ease}
+
+/* Card swap glow */
+@keyframes swapGlow{0%,100%{box-shadow:none}50%{box-shadow:0 0 18px #4caf50,0 0 36px rgba(76,175,80,.35);transform:scale(1.08)}}
+.anim-swap{animation:swapGlow .5s ease}
+
+/* End-of-round card reveal (flip) */
+@keyframes cardReveal{0%{transform:rotateY(90deg) scale(.85);opacity:.4}60%{transform:rotateY(-6deg) scale(1.05)}100%{transform:rotateY(0deg) scale(1);opacity:1}}
+.anim-reveal{animation:cardReveal .42s ease forwards}
+
+/* Turn banner slide */
+@keyframes bannerIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+.anim-banner{animation:bannerIn .25s ease}
+
+/* Opponent row highlight on their turn */
+@keyframes rowPop{0%,100%{background:var(--surface)}50%{background:rgba(233,69,96,.18)}}
+.anim-row{animation:rowPop .45s ease}
+
+@media(prefers-reduced-motion:reduce){
+  .anim-deck,.anim-discard,.anim-swap,.anim-reveal,.anim-banner,.anim-row,.action-notif{animation:none!important;transition:none!important}
+}
+
 /* ── Swap target highlight ── */
 .card.swap-target{box-shadow:0 0 14px #4caf50,0 0 28px rgba(76,175,80,.3);border-color:#4caf50}
 .card.swap-source{box-shadow:0 0 14px var(--gold);border-color:var(--gold)}
@@ -207,6 +239,8 @@ let isHost = false;
 let gameState = null;
 let swapSelection = { ownIndex: null };
 let pendingAction = null; // 'takeDiscard' | 'takeDeck' | 'special-peek' | 'special-swap' | 'double'
+let prevPhase = null;
+let pendingAnim = null; // set by 'action' event, consumed by next render
 
 // ════════════════════════════════════════════════════════════════
 // SCREEN NAV
@@ -319,6 +353,22 @@ socket.on('gameState', (state) => {
   renderGame(state);
 });
 
+socket.on('action', ({ type, playerId, name, targetName }) => {
+  const isMine = playerId === myPlayerId;
+  const actor = isMine ? 'Τράβηξες' : name;
+  const labels = {
+    drawDeck:    isMine ? '🃏 Τράβηξες κάρτα από τη στοίβα' : `🃏 ${name} τράβηξε κάρτα`,
+    drawDiscard: isMine ? '♻️ Πήρες από τα σκάρτα'         : `♻️ ${name} πήρε από τα σκάρτα`,
+    discard:     isMine ? '🗑️ Πέταξες κάρτα'               : `🗑️ ${name} πέταξε κάρτα`,
+    swap:        isMine ? `🔄 Ανταλλαγή με ${targetName||''}` : `🔄 ${name} ανταλλαγή με ${isMine?'σένα':(targetName||'')}`,
+    peek:        isMine ? '👁️ Κοιτάς κάρτα σου'            : `👁️ ${name} κοιτά κάρτα`,
+    callEnd:     isMine ? '🏁 Κάλεσες ΤΕΛΟΣ!'               : `🏁 ${name} κάλεσε ΤΕΛΟΣ!`,
+  };
+  if (labels[type]) showActionNotif(labels[type]);
+  pendingAnim = { type, playerId, isMine };
+  if (type === 'drawDeck') triggerAnim('deck-card', 'anim-deck');
+});
+
 function renderGame(state) {
   showScreen('game-screen');
 
@@ -326,19 +376,27 @@ function renderGame(state) {
   const opponents = state.players.filter(p => !p.isMe);
   const isMyTurn = state.currentPlayerId === myPlayerId;
   const phase = state.phase;
+  const wasScoring = prevPhase === 'scoring';
+  const nowScoring = phase === 'scoring' || phase === 'gameover';
 
   // Turn banner
   const banner = document.getElementById('turn-banner');
+  const prevBannerText = banner.textContent;
+  let newBannerText;
   if (phase === 'peek') {
-    banner.textContent = '👁️ Κοίτα τις 2 ακριανές κάρτες σου!';
+    newBannerText = '👁️ Κοίτα τις 2 ακριανές κάρτες σου!';
     banner.className = 'turn-banner';
   } else if (isMyTurn) {
-    banner.textContent = '⭐ Η σειρά σου!';
+    newBannerText = '⭐ Η σειρά σου!';
     banner.className = 'turn-banner my-turn';
   } else {
     const cur = state.players.find(p => p.id === state.currentPlayerId);
-    banner.textContent = `Σειρά: ${cur?.name || '—'}`;
+    newBannerText = `Σειρά: ${cur?.name || '—'}`;
     banner.className = 'turn-banner';
+  }
+  if (newBannerText !== prevBannerText) {
+    banner.textContent = newBannerText;
+    triggerAnim('turn-banner', 'anim-banner');
   }
 
   // Deck
@@ -366,11 +424,19 @@ function renderGame(state) {
 
   // Peek phase modal
   if (phase === 'peek') showPeekModal(myPlayer);
+
+  // End-of-round reveal animation
+  if (nowScoring && prevPhase !== 'scoring' && prevPhase !== 'gameover') {
+    setTimeout(animateEndOfRound, 80);
+  }
+  prevPhase = phase;
+  pendingAnim = null;
 }
 
 function renderDiscardTop(card) {
   const pile = document.getElementById('discard-pile');
   let el = pile.querySelector('.card');
+  const oldInner = el ? el.innerHTML : null;
   if (!el) {
     el = document.createElement('div');
     pile.appendChild(el);
@@ -381,22 +447,31 @@ function renderDiscardTop(card) {
     return;
   }
   el.className = 'card face-up' + (card.type === 'special' ? ' special' : card.value === 9 ? ' val-9' : card.value === 0 ? ' val-0' : '');
+  let newInner;
   if (card.type === 'special') {
     const [e, n] = SPECIAL_LABELS[card.name] || ['?','?'];
-    el.innerHTML = `<span class="card-value">${e}</span><span class="card-sub">${n}</span>`;
+    newInner = `<span class="card-value">${e}</span><span class="card-sub">${n}</span>`;
   } else {
-    el.innerHTML = `<span class="card-value">${card.value}</span>`;
+    newInner = `<span class="card-value">${card.value}</span>`;
+  }
+  el.innerHTML = newInner;
+  if (oldInner !== null && oldInner !== newInner) {
+    el.classList.remove('anim-discard');
+    void el.offsetWidth;
+    el.classList.add('anim-discard');
+    el.addEventListener('animationend', () => el.classList.remove('anim-discard'), { once: true });
   }
 }
 
 function renderOpponents(opponents, state) {
   const area = document.getElementById('opponents-area');
+  const isSwap = pendingAnim?.type === 'swap';
   area.innerHTML = opponents.map(p => {
     const isCur = p.id === state.currentPlayerId;
-    const cards = p.cards.map((c,i) =>
-      cardHTML(c, { small: true })
-    ).join('');
-    return `<div class="opponent-row${isCur ? ' animate-in' : ''}" style="${isCur ? 'border:1px solid var(--accent)' : ''}">
+    const isSwapInvolved = isSwap && (p.id === pendingAnim.playerId || p.id === state.currentPlayerId);
+    const cards = p.cards.map((c,i) => cardHTML(c, { small: true })).join('');
+    const extraAnim = isSwapInvolved ? ' anim-row' : (isCur ? ' animate-in' : '');
+    return `<div class="opponent-row${extraAnim}" style="${isCur ? 'border:1px solid var(--accent)' : ''}">
       <div class="opponent-name">${isCur ? '▶ ' : ''}${escHtml(p.name)}<span style="color:var(--muted);font-size:.7rem"> (${p.totalScore})</span></div>
       <div class="opponent-cards">${cards}</div>
     </div>`;
@@ -623,6 +698,44 @@ function showGameOverModal(state) {
     <button class="btn btn-primary" id="btn-new-game">Νέο Παιχνίδι</button>`;
   showModal(html);
   document.getElementById('btn-new-game')?.addEventListener('click', () => location.reload());
+}
+
+// ════════════════════════════════════════════════════════════════
+// ANIMATION HELPERS
+// ════════════════════════════════════════════════════════════════
+function triggerAnim(elId, cls) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+  el.addEventListener('animationend', () => el.classList.remove(cls), { once: true });
+}
+
+function showActionNotif(msg) {
+  let el = document.getElementById('action-notif');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'action-notif';
+    el.className = 'action-notif';
+    document.body.appendChild(el);
+  }
+  clearTimeout(el._t);
+  el.textContent = msg;
+  el.classList.add('show');
+  el._t = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function animateEndOfRound() {
+  const cards = document.querySelectorAll('#my-cards .card, #opponents-area .card');
+  cards.forEach((card, i) => {
+    setTimeout(() => {
+      card.classList.remove('anim-reveal');
+      void card.offsetWidth;
+      card.classList.add('anim-reveal');
+      card.addEventListener('animationend', () => card.classList.remove('anim-reveal'), { once: true });
+    }, i * 65);
+  });
 }
 
 // ════════════════════════════════════════════════════════════════

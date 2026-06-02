@@ -155,6 +155,11 @@ function initGame(room) {
   broadcastState(room);
 }
 
+// ── Player name helper ────────────────────────────────────────────────────────
+function playerName(room, playerId) {
+  return room.players.find(p => p.id === playerId)?.name || 'Παίκτης';
+}
+
 // ── Draw from deck helper ─────────────────────────────────────────────────────
 function drawFromDeck(game) {
   if (game.deck.length === 0) {
@@ -318,6 +323,7 @@ io.on('connection', (socket) => {
     const top = g.discard[g.discard.length - 1];
     if (!top || top.type === 'special') return socket.emit('error', { message: 'Δεν μπορείς να πάρεις ειδική κάρτα από τα σκάρτα.' });
 
+    io.to(currentRoom).emit('action', { type: 'drawDiscard', playerId: currentPlayerId, name: playerName(room, currentPlayerId) });
     g.drawnCard = { ...top, fromDiscard: true };
     g.discard.pop();
     g.actionState = 'swapOwn';
@@ -332,6 +338,7 @@ io.on('connection', (socket) => {
     if (g.currentPlayerId !== currentPlayerId) return;
     if (g.actionState !== 'choose') return;
 
+    io.to(currentRoom).emit('action', { type: 'drawDeck', playerId: currentPlayerId, name: playerName(room, currentPlayerId) });
     g.drawnCard = drawFromDeck(g);
     g.actionState = 'drawn';
     broadcastState(room);
@@ -348,10 +355,10 @@ io.on('connection', (socket) => {
     g.discard.push(g.drawnCard);
 
     if (g.actionState === 'double2') {
-      // Must use this card — but discardDrawn shouldn't be callable in double2
       return;
     }
 
+    io.to(currentRoom).emit('action', { type: 'discard', playerId: currentPlayerId, name: playerName(room, currentPlayerId) });
     g.drawnCard = null;
     g.actionState = 'choose';
     advanceTurn(room);
@@ -372,6 +379,7 @@ io.on('connection', (socket) => {
     const old = player.cards[cardIndex];
     player.cards[cardIndex] = g.drawnCard;
     g.discard.push(old);
+    io.to(currentRoom).emit('action', { type: 'discard', playerId: currentPlayerId, name: playerName(room, currentPlayerId) });
     g.drawnCard = null;
     g.actionState = 'choose';
     advanceTurn(room);
@@ -397,7 +405,6 @@ io.on('connection', (socket) => {
       g.actionState = 'special-swap';
       g.swapSelection = { ownIndex: null, targetId: null, targetIndex: null };
     } else if (special.name === 'double') {
-      // Double: already used the drawn card; now draw another
       g.doubleCard = drawFromDeck(g);
       g.drawnCard = g.doubleCard;
       g.actionState = 'double';
@@ -416,6 +423,7 @@ io.on('connection', (socket) => {
     const player = g.players.find((p) => p.id === currentPlayerId);
     if (!player || cardIndex < 0 || cardIndex > 3) return;
 
+    io.to(currentRoom).emit('action', { type: 'peek', playerId: currentPlayerId, name: playerName(room, currentPlayerId) });
     player.peekedIndices = [cardIndex];
     g.actionState = 'peeking';
     broadcastState(room);
@@ -444,11 +452,11 @@ io.on('connection', (socket) => {
     if (!me || !target || me === target) return;
     if (ownIndex < 0 || ownIndex > 3 || targetIndex < 0 || targetIndex > 3) return;
 
-    // Swap silently
     const tmp = me.cards[ownIndex];
     me.cards[ownIndex] = target.cards[targetIndex];
     target.cards[targetIndex] = tmp;
 
+    io.to(currentRoom).emit('action', { type: 'swap', playerId: currentPlayerId, name: playerName(room, currentPlayerId), targetId, targetName: playerName(room, targetId) });
     g.actionState = 'choose';
     advanceTurn(room);
   });
@@ -485,14 +493,13 @@ io.on('connection', (socket) => {
     if (g.currentPlayerId !== currentPlayerId) return;
     if (g.phase !== 'playing') return;
 
-    // All players must have played at least once
     if (!g.players.every((p) => p.playedThisRound)) {
       return socket.emit('error', { message: 'Όλοι πρέπει να παίξουν τουλάχιστον μία φορά πρώτα.' });
     }
 
+    io.to(currentRoom).emit('action', { type: 'callEnd', playerId: currentPlayerId, name: playerName(room, currentPlayerId) });
     g.endCalledBy = currentPlayerId;
     g.phase = 'lastRound';
-    // Everyone except caller gets one more turn
     g.lastRoundPlayers = g.players.filter((p) => p.id !== currentPlayerId).map((p) => p.id);
     broadcastState(room);
     advanceTurn(room);
