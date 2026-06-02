@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Style Preview — Κάστορες & Ποντίκια</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#111;color:#fff;padding:20px;display:flex;flex-direction:column;gap:40px;align-items:center}
+h2{text-align:center;font-size:1rem;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.row{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;width:100%}
+.preview{width:320px;border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.label{text-align:center;color:#888;font-size:.8rem;margin-top:8px}
+
+/* ══════════════════════════════════════════════
+   STYLE 4 — WARM CLASSIC (new design system)
+══════════════════════════════════════════════ */
+.ds-wrap{background:#faf7f5;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.ds-title{font-family:'Libre Baskerville',serif;font-size:1.55rem;font-weight:700;color:#9b2c2c;text-align:center}
+.ds-title span{display:block;font-family:'Poppins',sans-serif;font-size:.82rem;color:#57534e;font-weight:400}
+.ds-input{width:100%;background:#fff;border:1.5px solid #f5e8d2;border-radius:6px;padding:11px 14px;color:#1a1a1a;font-family:'Poppins',sans-serif;font-size:.92rem;outline:none;box-shadow:1px 1px 16px -2px hsl(0 63% 18% / .12)}
+.ds-input:focus{border-color:#9b2c2c}
+.ds-btn{width:100%;padding:12px;border:none;border-radius:6px;font-family:'Poppins',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;background:#9b2c2c;color:#fff;box-shadow:1px 1px 16px -2px hsl(0 63% 18% / .18)}
+.ds-btn.secondary{background:#fdf2d6;color:#805500;border:1.5px solid #f5e8d2;box-shadow:none}
+.ds-divider{color:#d6d3d1;font-size:.8rem;width:100%;text-align:center;position:relative}
+.ds-divider::before,.ds-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#f5e8d2}
+.ds-divider::before{left:0}.ds-divider::after{right:0}
+
+/* game — light */
+.ds-game{background:#faf7f5;display:flex;flex-direction:column}
+.ds-banner{background:#9b2c2c;color:#fff;padding:9px 16px;font-family:'Poppins',sans-serif;font-size:.85rem;font-weight:700;text-align:center}
+.ds-banner.myturn{background:#15803d;color:#fff}
+.ds-opp{margin:7px 12px;background:#fff;border-radius:6px;padding:9px 12px;display:flex;align-items:center;gap:10px;border:1px solid #f5e8d2;box-shadow:1px 1px 8px -2px hsl(0 63% 18% / .08)}
+.ds-opp-name{flex:1;font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:600;color:#1a1a1a}
+.ds-score{color:#57534e;font-size:.7rem}
+.ds-cards-row{display:flex;gap:4px}
+.dscard{width:36px;height:52px;border-radius:5px;background:#f0ebe8;border:1px solid #f5e8d2}
+.dscard.face{background:#fff;color:#1a1a1a;font-weight:900;font-size:.95rem;border:1px solid #e8ddd5;box-shadow:0 2px 6px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center}
+.ds-center{display:flex;justify-content:space-around;padding:12px;background:#fdf8f5;border-top:1px solid #f5e8d2;border-bottom:1px solid #f5e8d2}
+.ds-pile-lbl{font-family:'Poppins',sans-serif;font-size:.6rem;color:#57534e;text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:5px}
+.ds-deck-count{font-family:'Poppins',sans-serif;font-size:.6rem;color:#57534e;text-align:center;margin-top:4px}
+.dsbigcard{width:50px;height:72px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1.35rem;font-weight:900}
+.dsbigcard.back{background:#7f1d1d;color:#fca5a5;box-shadow:1px 1px 12px -2px hsl(0 63% 18% / .25)}
+.dsbigcard.front{background:#fff;color:#9b2c2c;border:1.5px solid #f5e8d2;box-shadow:1px 1px 12px -2px hsl(0 63% 18% / .15)}
+.ds-actions{padding:10px 12px;display:flex;gap:8px;justify-content:center;background:#faf7f5}
+.ds-act{padding:8px 14px;border:none;border-radius:6px;font-family:'Poppins',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer}
+.ds-act.primary{background:#9b2c2c;color:#fff;box-shadow:1px 1px 10px -2px hsl(0 63% 18% / .2)}
+.ds-act.sec{background:#fdf2d6;color:#805500;border:1px solid #f5e8d2}
+.ds-mycards{padding:10px 12px 14px;display:flex;justify-content:center;gap:10px;background:#faf7f5}
+.mydscard{width:52px;height:76px;border-radius:7px;background:#f0ebe8;border:1.5px solid #f5e8d2}
+
+/* dark variants */
+.ds-game.dark{background:#1c1917}
+.ds-game.dark .ds-opp{background:#292524;border-color:#44403c;box-shadow:none}
+.ds-game.dark .ds-opp-name{color:#f5f5f4}
+.ds-game.dark .ds-score{color:#d6d3d1}
+.ds-game.dark .ds-center{background:#292524;border-color:#44403c}
+.ds-game.dark .ds-pile-lbl,.ds-game.dark .ds-deck-count{color:#d6d3d1}
+.ds-game.dark .ds-actions,.ds-game.dark .ds-mycards{background:#1c1917}
+.dsbigcard.back.dark{background:#7f1d1d;color:#fca5a5}
+.dsbigcard.front.dark{background:#292524;color:#f87171;border-color:#44403c}
+.ds-act.sec.dark{background:#292524;color:#fef3c7;border-color:#44403c}
+.mydscard.dark{background:#292524;border-color:#44403c}
+
+/* ══════════════════════════════════════════════
+   STYLE 1 — GLASSMORPHISM DARK
+══════════════════════════════════════════════ */
+.glass-wrap{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.glass-wrap h1{font-size:1.6rem;font-weight:900;background:linear-gradient(90deg,#e94560,#f5a623);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.glass-wrap h1 span{display:block;font-size:.85rem;-webkit-text-fill-color:#aaa;font-weight:400;text-align:center}
+.glass-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 16px;color:#fff;font-size:.95rem;outline:none;backdrop-filter:blur(4px)}
+.glass-btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#e94560,#c0392b);color:#fff;letter-spacing:.5px}
+.glass-btn.secondary{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#ddd}
+.glass-divider{color:rgba(255,255,255,.3);font-size:.8rem;width:100%;text-align:center;position:relative}
+.glass-divider::before,.glass-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:rgba(255,255,255,.15)}
+.glass-divider::before{left:0}.glass-divider::after{right:0}
+/* game preview */
+.glass-game{background:linear-gradient(180deg,#0f0c29 0%,#1a1a3e 100%);padding:0;display:flex;flex-direction:column}
+.glass-banner{background:linear-gradient(90deg,rgba(233,69,96,.8),rgba(192,57,43,.8));backdrop-filter:blur(8px);padding:9px 16px;font-size:.85rem;font-weight:700;text-align:center}
+.glass-opp{padding:10px 14px;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);margin:8px;border-radius:12px;border:1px solid rgba(255,255,255,.08)}
+.glass-opp-name{flex:1;font-size:.82rem;font-weight:600}
+.glass-cards-row{display:flex;gap:5px}
+.gcard{width:38px;height:56px;border-radius:7px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:rgba(255,255,255,.3)}
+.gcard.face{background:rgba(255,255,255,.92);color:#222;font-weight:900;font-size:1rem;border:none}
+.gcard.face.red{color:#c0392b}
+.gcard.face.green{color:#27ae60}
+.glass-center{display:flex;justify-content:space-around;padding:12px 16px;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+.pile-box{display:flex;flex-direction:column;align-items:center;gap:5px}
+.pile-lbl{font-size:.6rem;color:#888;letter-spacing:1px;text-transform:uppercase}
+.bigcard{width:52px;height:74px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900}
+.bigcard.back{background:linear-gradient(135deg,#1e5a8a,#0f3460);border:2px solid #2a7ab8;color:#2a7ab8}
+.bigcard.front{background:#fff;color:#e94560;border:2px solid #eee}
+.glass-actions{padding:10px 14px;display:flex;gap:8px;justify-content:center}
+.act-btn{padding:9px 14px;border:none;border-radius:10px;font-size:.8rem;font-weight:700;cursor:pointer}
+.act-btn.primary{background:linear-gradient(135deg,#e94560,#c0392b);color:#fff}
+.act-btn.sec{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#ddd}
+.glass-mycards{padding:10px 14px 16px;display:flex;justify-content:center;gap:10px}
+.mycard{width:54px;height:78px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.2);font-size:.7rem}
+
+/* ══════════════════════════════════════════════
+   STYLE 2 — CLEAN LIGHT / MINIMAL
+══════════════════════════════════════════════ */
+.clean-wrap{background:#f5f5f7;padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.clean-wrap h1{font-size:1.6rem;font-weight:900;color:#1d1d1f}
+.clean-wrap h1 span{display:block;font-size:.85rem;color:#86868b;font-weight:400;text-align:center}
+.clean-input{width:100%;background:#fff;border:1.5px solid #d1d1d6;border-radius:12px;padding:12px 16px;color:#1d1d1f;font-size:.95rem;outline:none;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.clean-btn{width:100%;padding:13px;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;background:#1d1d1f;color:#fff}
+.clean-btn.secondary{background:#fff;border:1.5px solid #d1d1d6;color:#1d1d1f}
+.clean-divider{color:#c7c7cc;font-size:.8rem;width:100%;text-align:center;position:relative}
+.clean-divider::before,.clean-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#e5e5ea}
+.clean-divider::before{left:0}.clean-divider::after{right:0}
+/* game */
+.clean-game{background:#fff;display:flex;flex-direction:column}
+.clean-banner{background:#1d1d1f;color:#fff;padding:9px 16px;font-size:.85rem;font-weight:700;text-align:center}
+.clean-banner.myturn{background:#34c759}
+.clean-opp{margin:8px 12px;background:#f5f5f7;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.clean-opp-name{flex:1;font-size:.82rem;font-weight:600;color:#1d1d1f}
+.ccard{width:38px;height:56px;border-radius:7px;background:#e5e5ea;border:none;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:#c7c7cc}
+.ccard.face{background:#fff;color:#1d1d1f;font-weight:900;font-size:1rem;border:1.5px solid #e5e5ea;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.ccard.face.red{color:#ff3b30}
+.ccard.face.green{color:#34c759}
+.clean-center{display:flex;justify-content:space-around;padding:14px;border-top:1px solid #f2f2f7;border-bottom:1px solid #f2f2f7;background:#f9f9fb}
+.cbigcard{width:52px;height:74px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900}
+.cbigcard.back{background:#3a3a3c;color:#636366}
+.cbigcard.front{background:#fff;color:#ff3b30;box-shadow:0 4px 16px rgba(0,0,0,.12);border:1.5px solid #e5e5ea}
+.clean-actions{padding:10px 14px;display:flex;gap:8px;justify-content:center}
+.cact-btn{padding:9px 16px;border:none;border-radius:20px;font-size:.8rem;font-weight:700;cursor:pointer}
+.cact-btn.primary{background:#1d1d1f;color:#fff}
+.cact-btn.sec{background:#f2f2f7;color:#1d1d1f}
+.clean-mycards{padding:10px 14px 16px;display:flex;justify-content:center;gap:10px}
+.myccard{width:54px;height:78px;border-radius:10px;background:#f2f2f7;border:1.5px solid #e5e5ea;display:flex;align-items:center;justify-content:center;color:#c7c7cc;font-size:.7rem}
+
+/* ══════════════════════════════════════════════
+   STYLE 3 — PLAYFUL / WARM
+══════════════════════════════════════════════ */
+.play-wrap{background:linear-gradient(160deg,#1e3a5f 0%,#0d2137 100%);padding:28px 24px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.play-wrap h1{font-size:1.7rem;font-weight:900;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.4)}
+.play-wrap h1 span{display:block;font-size:.85rem;color:#94b8d4;font-weight:400;text-align:center}
+.play-input{width:100%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);border-radius:14px;padding:12px 16px;color:#fff;font-size:.95rem;outline:none}
+.play-btn{width:100%;padding:13px;border:none;border-radius:14px;font-size:.95rem;font-weight:800;cursor:pointer;background:#f9a825;color:#1a2a3a;letter-spacing:.3px;box-shadow:0 4px 16px rgba(249,168,37,.3)}
+.play-btn.secondary{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);color:#fff;box-shadow:none}
+.play-divider{color:rgba(255,255,255,.3);font-size:.8rem;width:100%;text-align:center;position:relative}
+.play-divider::before,.play-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:rgba(255,255,255,.15)}
+.play-divider::before{left:0}.play-divider::after{right:0}
+/* game */
+.play-game{background:linear-gradient(180deg,#1e3a5f,#0d2137);display:flex;flex-direction:column}
+.play-banner{background:#f9a825;color:#1a2a3a;padding:10px 16px;font-size:.88rem;font-weight:800;text-align:center;letter-spacing:.3px}
+.play-banner.myturn{background:#4caf50;color:#fff}
+.play-opp{margin:8px 12px;background:rgba(255,255,255,.07);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;border:1.5px solid rgba(255,255,255,.1)}
+.play-opp-name{flex:1;font-size:.82rem;font-weight:700;color:#fff}
+.pcard{width:38px;height:56px;border-radius:8px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:.65rem;color:rgba(255,255,255,.25)}
+.pcard.face{background:#fff;color:#1a2a3a;font-weight:900;font-size:1rem;border:none;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.pcard.face.red{color:#e53935}
+.pcard.face.green{color:#43a047}
+.play-center{display:flex;justify-content:space-around;padding:12px 16px;border-top:1.5px solid rgba(255,255,255,.07);border-bottom:1.5px solid rgba(255,255,255,.07)}
+.pbigcard{width:52px;height:74px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900}
+.pbigcard.back{background:linear-gradient(135deg,#1565c0,#0d47a1);border:2px solid #1976d2;color:#42a5f5}
+.pbigcard.front{background:#fff;color:#e53935;box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.play-actions{padding:10px 14px;display:flex;gap:8px;justify-content:center}
+.pact-btn{padding:9px 16px;border:none;border-radius:22px;font-size:.8rem;font-weight:800;cursor:pointer}
+.pact-btn.primary{background:#f9a825;color:#1a2a3a;box-shadow:0 3px 10px rgba(249,168,37,.3)}
+.pact-btn.sec{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.15);color:#fff}
+.play-mycards{padding:10px 14px 16px;display:flex;justify-content:center;gap:10px}
+.mypcard{width:54px;height:78px;border-radius:11px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.2);font-size:.7rem}
+</style>
+</head>
+<body>
+
+<h2>Επίλεξε στυλ — Lobby</h2>
+<div class="row">
+
+  <!-- ── STYLE 1: GLASSMORPHISM ── -->
+  <div>
+    <div class="preview">
+      <div class="glass-wrap">
+        <h1>🦫 Κάστορες<span>& Ποντίκια</span></h1>
+        <input class="glass-input" placeholder="Το όνομά σου" value="Νίκος">
+        <button class="glass-btn">Δημιουργία Δωματίου</button>
+        <div class="glass-divider">ή</div>
+        <input class="glass-input" placeholder="Κωδικός 1234" style="letter-spacing:4px;text-align:center" value="5823">
+        <button class="glass-btn secondary">Είσοδος σε Δωμάτιο</button>
+      </div>
+    </div>
+    <div class="label">① Glassmorphism Dark</div>
+  </div>
+
+  <!-- ── STYLE 2: CLEAN LIGHT ── -->
+  <div>
+    <div class="preview">
+      <div class="clean-wrap">
+        <h1>🦫 Κάστορες<span>& Ποντίκια</span></h1>
+        <input class="clean-input" placeholder="Το όνομά σου" value="Νίκος">
+        <button class="clean-btn">Δημιουργία Δωματίου</button>
+        <div class="clean-divider">ή</div>
+        <input class="clean-input" placeholder="Κωδικός 1234" style="letter-spacing:4px;text-align:center" value="5823">
+        <button class="clean-btn secondary">Είσοδος σε Δωμάτιο</button>
+      </div>
+    </div>
+    <div class="label">② Clean Light / Minimal</div>
+  </div>
+
+  <!-- ── STYLE 3: PLAYFUL ── -->
+  <div>
+    <div class="preview">
+      <div class="play-wrap">
+        <h1>🦫 Κάστορες<span>& Ποντίκια</span></h1>
+        <input class="play-input" placeholder="Το όνομά σου" value="Νίκος">
+        <button class="play-btn">Δημιουργία Δωματίου</button>
+        <div class="play-divider">ή</div>
+        <input class="play-input" placeholder="Κωδικός 1234" style="letter-spacing:4px;text-align:center" value="5823">
+        <button class="play-btn secondary">Είσοδος σε Δωμάτιο</button>
+      </div>
+    </div>
+    <div class="label">③ Playful / Navy & Gold</div>
+  </div>
+
+</div>
+
+<h2>Game Screen</h2>
+<div class="row">
+
+  <!-- ── GAME 1: GLASSMORPHISM ── -->
+  <div>
+    <div class="preview">
+      <div class="glass-game">
+        <div class="glass-banner">Σειρά: Μαρία</div>
+        <div class="glass-opp">
+          <div class="glass-opp-name">Μαρία</div>
+          <div class="glass-cards-row">
+            <div class="gcard"></div><div class="gcard"></div><div class="gcard"></div><div class="gcard"></div>
+          </div>
+        </div>
+        <div class="glass-opp">
+          <div class="glass-opp-name">Κώστας <span style="color:#555;font-size:.7rem">(12)</span></div>
+          <div class="glass-cards-row">
+            <div class="gcard"></div><div class="gcard"></div><div class="gcard"></div><div class="gcard"></div>
+          </div>
+        </div>
+        <div class="glass-center">
+          <div class="pile-box">
+            <div class="pile-lbl">Στοίβα</div>
+            <div class="bigcard back">🂠</div>
+            <div style="font-size:.65rem;color:#666">24 κάρτες</div>
+          </div>
+          <div class="pile-box">
+            <div class="pile-lbl">Σκάρτα</div>
+            <div class="bigcard front">7</div>
+          </div>
+        </div>
+        <div class="glass-actions">
+          <button class="act-btn primary">🃏 Τράβα κάρτα</button>
+          <button class="act-btn sec">♻️ Σκάρτα</button>
+        </div>
+        <div class="glass-mycards">
+          <div class="mycard"></div><div class="mycard"></div><div class="mycard"></div><div class="mycard"></div>
+        </div>
+      </div>
+    </div>
+    <div class="label">① Glassmorphism Dark</div>
+  </div>
+
+  <!-- ── GAME 2: CLEAN LIGHT ── -->
+  <div>
+    <div class="preview">
+      <div class="clean-game">
+        <div class="clean-banner myturn">⭐ Η σειρά σου!</div>
+        <div class="clean-opp">
+          <div class="clean-opp-name">Μαρία</div>
+          <div class="glass-cards-row">
+            <div class="ccard"></div><div class="ccard"></div><div class="ccard"></div><div class="ccard"></div>
+          </div>
+        </div>
+        <div class="clean-opp">
+          <div class="clean-opp-name">Κώστας <span style="color:#86868b;font-size:.7rem">(12)</span></div>
+          <div class="glass-cards-row">
+            <div class="ccard"></div><div class="ccard"></div><div class="ccard"></div><div class="ccard"></div>
+          </div>
+        </div>
+        <div class="clean-center">
+          <div class="pile-box">
+            <div class="pile-lbl" style="color:#86868b">Στοίβα</div>
+            <div class="cbigcard back">🂠</div>
+            <div style="font-size:.65rem;color:#86868b">24 κάρτες</div>
+          </div>
+          <div class="pile-box">
+            <div class="pile-lbl" style="color:#86868b">Σκάρτα</div>
+            <div class="cbigcard front">7</div>
+          </div>
+        </div>
+        <div class="clean-actions">
+          <button class="cact-btn primary">🃏 Τράβα κάρτα</button>
+          <button class="cact-btn sec">♻️ Σκάρτα</button>
+        </div>
+        <div class="clean-mycards">
+          <div class="myccard"></div><div class="myccard"></div><div class="myccard"></div><div class="myccard"></div>
+        </div>
+      </div>
+    </div>
+    <div class="label">② Clean Light / Minimal</div>
+  </div>
+
+  <!-- ── GAME 3: PLAYFUL ── -->
+  <div>
+    <div class="preview">
+      <div class="play-game">
+        <div class="play-banner">Σειρά: Μαρία</div>
+        <div class="play-opp">
+          <div class="play-opp-name">Μαρία</div>
+          <div class="glass-cards-row">
+            <div class="pcard"></div><div class="pcard"></div><div class="pcard"></div><div class="pcard"></div>
+          </div>
+        </div>
+        <div class="play-opp">
+          <div class="play-opp-name">Κώστας <span style="color:#5a8ab0;font-size:.7rem">(12)</span></div>
+          <div class="glass-cards-row">
+            <div class="pcard"></div><div class="pcard"></div><div class="pcard"></div><div class="pcard"></div>
+          </div>
+        </div>
+        <div class="play-center">
+          <div class="pile-box">
+            <div class="pile-lbl" style="color:#5a8ab0">Στοίβα</div>
+            <div class="pbigcard back">🂠</div>
+            <div style="font-size:.65rem;color:#5a8ab0">24 κάρτες</div>
+          </div>
+          <div class="pile-box">
+            <div class="pile-lbl" style="color:#5a8ab0">Σκάρτα</div>
+            <div class="pbigcard front">7</div>
+          </div>
+        </div>
+        <div class="play-actions">
+          <button class="pact-btn primary">🃏 Τράβα κάρτα</button>
+          <button class="pact-btn sec">♻️ Σκάρτα</button>
+        </div>
+        <div class="play-mycards">
+          <div class="mypcard"></div><div class="mypcard"></div><div class="mypcard"></div><div class="mypcard"></div>
+        </div>
+      </div>
+    </div>
+    <div class="label">③ Playful / Navy & Gold</div>
+  </div>
+
+  <!-- ── STYLE 4: NEW DESIGN SYSTEM ── -->
+  <div>
+    <div class="preview">
+      <div class="ds-wrap">
+        <h1 class="ds-title">🦫 Κάστορες<span>& Ποντίκια</span></h1>
+        <input class="ds-input" placeholder="Το όνομά σου" value="Νίκος">
+        <button class="ds-btn">Δημιουργία Δωματίου</button>
+        <div class="ds-divider">ή</div>
+        <input class="ds-input" placeholder="1234" style="letter-spacing:4px;text-align:center" value="5823">
+        <button class="ds-btn secondary">Είσοδος σε Δωμάτιο</button>
+      </div>
+    </div>
+    <div class="label">④ Warm Classic (νέο design system)</div>
+  </div>
+
+</div>
+
+<h2>Game Screen — ④ Warm Classic</h2>
+<div class="row">
+  <div>
+    <div class="preview">
+      <div class="ds-game">
+        <div class="ds-banner">Σειρά: Μαρία</div>
+        <div class="ds-opp">
+          <div class="ds-opp-name">Μαρία</div>
+          <div class="ds-cards-row">
+            <div class="dscard"></div><div class="dscard"></div><div class="dscard"></div><div class="dscard"></div>
+          </div>
+        </div>
+        <div class="ds-opp">
+          <div class="ds-opp-name">Κώστας <span class="ds-score">(12)</span></div>
+          <div class="ds-cards-row">
+            <div class="dscard"></div><div class="dscard"></div><div class="dscard"></div><div class="dscard"></div>
+          </div>
+        </div>
+        <div class="ds-center">
+          <div class="pile-box">
+            <div class="ds-pile-lbl">Στοίβα</div>
+            <div class="dsbigcard back">🂠</div>
+            <div class="ds-deck-count">24 κάρτες</div>
+          </div>
+          <div class="pile-box">
+            <div class="ds-pile-lbl">Σκάρτα</div>
+            <div class="dsbigcard front">7</div>
+          </div>
+        </div>
+        <div class="ds-actions">
+          <button class="ds-act primary">🃏 Τράβα κάρτα</button>
+          <button class="ds-act sec">♻️ Σκάρτα</button>
+        </div>
+        <div class="ds-mycards">
+          <div class="mydscard"></div><div class="mydscard"></div><div class="mydscard"></div><div class="mydscard"></div>
+        </div>
+      </div>
+    </div>
+    <div class="label">④ Warm Classic — Game</div>
+  </div>
+
+  <!-- dark mode variant -->
+  <div>
+    <div class="preview">
+      <div class="ds-game dark">
+        <div class="ds-banner myturn">⭐ Η σειρά σου!</div>
+        <div class="ds-opp">
+          <div class="ds-opp-name">Μαρία</div>
+          <div class="ds-cards-row">
+            <div class="dscard"></div><div class="dscard"></div><div class="dscard"></div><div class="dscard"></div>
+          </div>
+        </div>
+        <div class="ds-opp">
+          <div class="ds-opp-name">Κώστας <span class="ds-score">(12)</span></div>
+          <div class="ds-cards-row">
+            <div class="dscard"></div><div class="dscard"></div><div class="dscard"></div><div class="dscard"></div>
+          </div>
+        </div>
+        <div class="ds-center">
+          <div class="pile-box">
+            <div class="ds-pile-lbl">Στοίβα</div>
+            <div class="dsbigcard back dark">🂠</div>
+            <div class="ds-deck-count">24 κάρτες</div>
+          </div>
+          <div class="pile-box">
+            <div class="ds-pile-lbl">Σκάρτα</div>
+            <div class="dsbigcard front dark">7</div>
+          </div>
+        </div>
+        <div class="ds-actions">
+          <button class="ds-act primary">🃏 Τράβα κάρτα</button>
+          <button class="ds-act sec dark">♻️ Σκάρτα</button>
+        </div>
+        <div class="ds-mycards">
+          <div class="mydscard dark"></div><div class="mydscard dark"></div><div class="mydscard dark"></div><div class="mydscard dark"></div>
+        </div>
+      </div>
+    </div>
+    <div class="label">④ Warm Classic — Dark mode</div>
+  </div>
+</div>
+
+</body>
+</html>
