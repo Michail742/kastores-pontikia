@@ -195,7 +195,10 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 <!-- ══════════════ GAME SCREEN ══════════════ -->
 <div id="game-screen" class="screen">
   <div class="game-layout">
-    <div class="turn-banner" id="turn-banner">Σειρά: —</div>
+    <div style="display:flex;align-items:stretch">
+      <div class="turn-banner" id="turn-banner" style="flex:1">Σειρά: —</div>
+      <button id="btn-exit" title="Έξοδος" style="background:#333;border:none;color:#aaa;font-size:.75rem;padding:0 12px;cursor:pointer;flex-shrink:0;border-left:1px solid #222">✕ Έξοδος</button>
+    </div>
     <div class="opponents-area" id="opponents-area"></div>
     <div class="center-area">
       <div class="pile" id="deck-pile" title="Πάρε από Στοίβα">
@@ -763,6 +766,11 @@ if ('serviceWorker' in navigator) {
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// Exit button
+document.getElementById('btn-exit').addEventListener('click', () => {
+  if (confirm('Να αποχωρήσεις από το παιχνίδι;')) location.reload();
+});
 
 // Close overlay on backdrop click (not modal)
 document.getElementById('overlay').addEventListener('click', (e) => {
