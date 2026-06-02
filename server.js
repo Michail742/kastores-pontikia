@@ -250,13 +250,13 @@ io.on('connection', (socket) => {
   let currentPlayerId = null;
 
   // ── CREATE ROOM ──
-  socket.on('createRoom', ({ name }) => {
+  socket.on('createRoom', ({ name, uuid }) => {
     const code = generateCode();
     const playerId = socket.id;
     rooms[code] = {
       code,
       hostId: playerId,
-      players: [{ id: playerId, name, totalScore: 0 }],
+      players: [{ id: playerId, name, totalScore: 0, uuid }],
       socketToPlayer: { [socket.id]: playerId },
       game: null,
       status: 'lobby',
@@ -269,20 +269,47 @@ io.on('connection', (socket) => {
   });
 
   // ── JOIN ROOM ──
-  socket.on('joinRoom', ({ code, name }) => {
+  socket.on('joinRoom', ({ code, name, uuid }) => {
     const room = rooms[code];
     if (!room) return socket.emit('error', { message: 'Δεν βρέθηκε δωμάτιο με αυτόν τον κωδικό.' });
     if (room.status !== 'lobby') return socket.emit('error', { message: 'Το παιχνίδι έχει ήδη ξεκινήσει.' });
     if (room.players.length >= 6) return socket.emit('error', { message: 'Το δωμάτιο είναι γεμάτο.' });
 
     const playerId = socket.id;
-    room.players.push({ id: playerId, name, totalScore: 0 });
+    room.players.push({ id: playerId, name, totalScore: 0, uuid });
     room.socketToPlayer[socket.id] = playerId;
     currentRoom = code;
     currentPlayerId = playerId;
     socket.join(code);
     socket.emit('roomJoined', { code, playerId });
     broadcastLobby(room);
+  });
+
+  // ── REJOIN (επανασύνδεση) ──
+  socket.on('rejoin', ({ uuid, code }) => {
+    const room = rooms[code];
+    if (!room) return socket.emit('rejoinFail', { message: 'Το δωμάτιο δεν υπάρχει πια.' });
+    const player = room.players.find(p => p.uuid === uuid);
+    if (!player) return socket.emit('rejoinFail', { message: 'Δεν βρέθηκε η συνεδρία σου.' });
+
+    room.socketToPlayer[socket.id] = player.id;
+    currentRoom = code;
+    currentPlayerId = player.id;
+    socket.join(code);
+    socket.emit('roomJoined', { code, playerId: player.id });
+    if (room.game) {
+      socket.emit('gameState', stateForPlayer(room, player.id));
+    } else {
+      broadcastLobby(room);
+    }
+  });
+
+  // ── HOST EXIT (εκδίωξη όλων) ──
+  socket.on('hostExit', () => {
+    const room = rooms[currentRoom];
+    if (!room || room.hostId !== currentPlayerId) return;
+    io.to(currentRoom).emit('kicked', { reason: 'Ο host έφυγε από το παιχνίδι.' });
+    delete rooms[currentRoom];
   });
 
   // ── START GAME ──

@@ -188,17 +188,29 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 <!-- ══════════════ LOBBY SCREEN ══════════════ -->
 <div id="lobby-screen" class="screen active">
   <h1>🦫 Κάστορες<span>&amp; Ποντίκια</span></h1>
-  <div class="input-group">
-    <label>Όνομα παίκτη</label>
-    <input type="text" id="player-name" placeholder="Το όνομά σου" maxlength="20">
+
+  <!-- Reconnect banner (εμφανίζεται μόνο αν υπάρχει αποθηκευμένη συνεδρία) -->
+  <div id="reconnect-section" style="display:none;width:100%;display:none;flex-direction:column;gap:8px;background:rgba(76,175,80,.12);border:1px solid rgba(76,175,80,.3);border-radius:var(--radius);padding:14px">
+    <div style="font-size:.8rem;color:#4caf50;text-align:center">Βρέθηκε αποθηκευμένη συνεδρία</div>
+    <div style="font-size:.9rem;text-align:center;color:var(--text)">Δωμάτιο: <b id="reconnect-room-code" style="color:var(--gold)">—</b></div>
+    <button class="btn btn-green" id="btn-reconnect">🔄 Επανασύνδεση</button>
+    <button class="btn btn-secondary" id="btn-forget" style="padding:8px;font-size:.8rem">Νέο παιχνίδι</button>
   </div>
-  <button class="btn btn-primary" id="btn-create">Δημιουργία Δωματίου</button>
-  <div class="divider">ή</div>
-  <div class="input-group">
-    <label>Κωδικός δωματίου</label>
-    <input type="number" id="room-code-input" placeholder="1234" maxlength="4">
+
+  <div id="new-game-section" style="width:100%;display:flex;flex-direction:column;gap:16px">
+    <div class="input-group">
+      <label>Όνομα παίκτη</label>
+      <input type="text" id="player-name" placeholder="Το όνομά σου" maxlength="20">
+    </div>
+    <button class="btn btn-primary" id="btn-create">Δημιουργία Δωματίου</button>
+    <div class="divider">ή</div>
+    <div class="input-group">
+      <label>Κωδικός δωματίου</label>
+      <input type="number" id="room-code-input" placeholder="1234" maxlength="4">
+    </div>
+    <button class="btn btn-secondary" id="btn-join">Είσοδος σε Δωμάτιο</button>
   </div>
-  <button class="btn btn-secondary" id="btn-join">Είσοδος σε Δωμάτιο</button>
+
   <div class="error-msg" id="lobby-error"></div>
 </div>
 
@@ -276,6 +288,57 @@ let prevActionState = null;
 let pendingAnim = null; // set by 'action' event, consumed by next render
 
 // ════════════════════════════════════════════════════════════════
+// SESSION (localStorage για επανασύνδεση)
+// ════════════════════════════════════════════════════════════════
+function getUUID() {
+  let uuid = localStorage.getItem('kp_uuid');
+  if (!uuid) {
+    uuid = (crypto.randomUUID?.() || Math.random().toString(36).slice(2) + Date.now().toString(36));
+    localStorage.setItem('kp_uuid', uuid);
+  }
+  return uuid;
+}
+function saveSession(code) { localStorage.setItem('kp_room', code); }
+function clearSession() { localStorage.removeItem('kp_room'); }
+function getSavedRoom() { return localStorage.getItem('kp_room'); }
+
+// Εμφάνισε reconnect banner αν υπάρχει αποθηκευμένη συνεδρία
+(function initReconnectUI() {
+  const saved = getSavedRoom();
+  if (!saved) return;
+  const sec = document.getElementById('reconnect-section');
+  const newSec = document.getElementById('new-game-section');
+  sec.style.display = 'flex';
+  newSec.style.display = 'none';
+  document.getElementById('reconnect-room-code').textContent = saved;
+})();
+
+document.getElementById('btn-reconnect').addEventListener('click', () => {
+  const code = getSavedRoom();
+  if (!code) return;
+  socket.emit('rejoin', { uuid: getUUID(), code });
+});
+
+document.getElementById('btn-forget').addEventListener('click', () => {
+  clearSession();
+  document.getElementById('reconnect-section').style.display = 'none';
+  document.getElementById('new-game-section').style.display = 'flex';
+});
+
+socket.on('rejoinFail', ({ message }) => {
+  clearSession();
+  document.getElementById('reconnect-section').style.display = 'none';
+  document.getElementById('new-game-section').style.display = 'flex';
+  lobbyError(message);
+});
+
+socket.on('kicked', ({ reason }) => {
+  clearSession();
+  showToast(reason);
+  setTimeout(() => location.reload(), 2000);
+});
+
+// ════════════════════════════════════════════════════════════════
 // SCREEN NAV
 // ════════════════════════════════════════════════════════════════
 function showScreen(id) {
@@ -328,7 +391,7 @@ function waitingError(msg) {
 document.getElementById('btn-create').addEventListener('click', () => {
   const name = getName();
   if (!name) return lobbyError('Γράψε το όνομά σου.');
-  socket.emit('createRoom', { name });
+  socket.emit('createRoom', { name, uuid: getUUID() });
 });
 
 document.getElementById('btn-join').addEventListener('click', () => {
@@ -336,7 +399,7 @@ document.getElementById('btn-join').addEventListener('click', () => {
   const code = document.getElementById('room-code-input').value.trim();
   if (!name) return lobbyError('Γράψε το όνομά σου.');
   if (code.length !== 4) return lobbyError('Ο κωδικός είναι 4 ψηφία.');
-  socket.emit('joinRoom', { code, name });
+  socket.emit('joinRoom', { code, name, uuid: getUUID() });
 });
 
 document.getElementById('btn-start').addEventListener('click', () => {
@@ -346,6 +409,7 @@ document.getElementById('btn-start').addEventListener('click', () => {
 socket.on('roomJoined', ({ code, playerId }) => {
   myPlayerId = playerId;
   myRoomCode = code;
+  saveSession(code);
   document.getElementById('display-code').textContent = code;
   showScreen('waiting-screen');
 });
@@ -743,7 +807,7 @@ function showGameOverModal(state) {
     <table class="score-table"><thead><tr><th>Παίκτης</th><th>Σύνολο</th></tr></thead><tbody>${rows}</tbody></table>
     <button class="btn btn-primary" id="btn-new-game">Νέο Παιχνίδι</button>`;
   showModal(html);
-  document.getElementById('btn-new-game')?.addEventListener('click', () => location.reload());
+  document.getElementById('btn-new-game')?.addEventListener('click', () => { clearSession(); location.reload(); });
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -896,7 +960,11 @@ function escHtml(s) {
 
 // Exit button
 document.getElementById('btn-exit').addEventListener('click', () => {
-  if (confirm('Να αποχωρήσεις από το παιχνίδι;')) location.reload();
+  if (confirm('Να αποχωρήσεις από το παιχνίδι;')) {
+    clearSession();
+    if (isHost) socket.emit('hostExit');
+    location.reload();
+  }
 });
 
 // Close overlay on backdrop click (not modal)
