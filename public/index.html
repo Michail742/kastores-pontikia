@@ -165,16 +165,16 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .screen.active{display:flex}
 
 /* ── Lobby ── */
-h1{font-size:1.8rem;text-align:center;color:var(--accent);font-family:'Libre Baskerville',serif}
+h1{font-size:1.8rem;text-align:center;color:var(--primary);font-family:'Libre Baskerville',serif}
 h1 span{display:block;font-size:.95rem;color:var(--muted-text);font-weight:400;font-family:'Poppins',sans-serif}
 .input-group{display:flex;flex-direction:column;gap:8px;width:100%}
 label{font-size:.82rem;color:var(--muted-text);font-weight:600}
 input{background:var(--surface);border:1.5px solid var(--border-col);border-radius:var(--radius);color:var(--text);padding:12px 16px;font-size:1rem;width:100%;outline:none;font-family:'Poppins',sans-serif;box-shadow:var(--shadow)}
-input:focus{border-color:var(--accent)}
+input:focus{border-color:var(--primary)}
 input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .btn{width:100%;padding:14px;border:none;border-radius:var(--radius);font-size:1rem;font-weight:700;cursor:pointer;transition:transform .1s,opacity .2s;font-family:'Poppins',sans-serif}
 .btn:active{transform:scale(.96)}
-.btn-primary{background:var(--accent);color:#fff;box-shadow:1px 1px 14px -2px hsl(0 63% 18%/.2)}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:1px 1px 14px -2px hsl(0 63% 18%/.2)}
 .btn-secondary{background:#fdf2d6;color:#805500;border:1.5px solid var(--border-col)}
 .btn-gold{background:var(--gold);color:#fff;box-shadow:var(--shadow)}
 .btn-green{background:var(--green);color:#fff}
@@ -183,10 +183,10 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border-col)}
 .divider::before{left:0}.divider::after{right:0}
 .error-msg{color:#991b1b;font-size:.85rem;text-align:center;min-height:20px}
-.code-display{font-size:3rem;letter-spacing:8px;color:var(--accent);font-weight:900;text-align:center;font-family:'Libre Baskerville',serif}
+.code-display{font-size:3rem;letter-spacing:8px;color:var(--primary);font-weight:900;text-align:center;font-family:'Libre Baskerville',serif}
 .player-list{width:100%;display:flex;flex-direction:column;gap:8px}
 .player-item{background:var(--surface);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;border:1px solid var(--border-col);box-shadow:var(--shadow)}
-.player-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.player-dot{width:10px;height:10px;border-radius:50%;background:var(--primary)}
 .waiting-text{color:var(--muted-text);font-size:.9rem;text-align:center;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
@@ -220,7 +220,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .my-cards{display:flex;gap:8px;justify-content:center}
 
 /* Turn indicator */
-.turn-banner{background:var(--accent);color:#fff;text-align:center;padding:8px;font-size:.85rem;font-weight:700;flex:0 0 auto;font-family:'Poppins',sans-serif}
+.turn-banner{background:var(--primary);color:#fff;text-align:center;padding:8px;font-size:.85rem;font-weight:700;flex:0 0 auto;font-family:'Poppins',sans-serif}
 .turn-banner.my-turn{background:var(--green)}
 
 /* ── Cards ── */
@@ -245,7 +245,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
 .overlay.hidden{display:none}
 .modal{background:var(--surface);border-radius:12px;padding:24px;max-width:340px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;border:1px solid var(--border-col);box-shadow:1px 2px 24px -2px hsl(0 63% 18%/.18)}
-.modal h2{font-size:1.2rem;color:var(--accent);font-family:'Libre Baskerville',serif}
+.modal h2{font-size:1.2rem;color:var(--primary);font-family:'Libre Baskerville',serif}
 .modal p{color:var(--muted-text);font-size:.9rem;line-height:1.5}
 .score-table{width:100%;border-collapse:collapse}
 .score-table th,.score-table td{padding:8px 10px;text-align:left;font-size:.9rem;border-bottom:1px solid var(--border-col)}
@@ -254,18 +254,18 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 
 /* ── Instructions overlay ── */
 .instruction-text{font-size:.95rem;color:var(--text);line-height:1.6;text-align:left;width:100%}
-.instruction-text b{color:var(--accent)}
+.instruction-text b{color:var(--primary)}
 
 /* ── Rules modal ── */
 .rules-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:0}
 .rules-overlay.hidden{display:none}
-.rules-sheet{background:var(--surface);width:100%;max-width:480px;max-height:90vh;border-radius:12px 12px 0 0;display:flex;flex-direction:column;overflow:hidden;border-top:2px solid var(--accent);box-shadow:0 -8px 32px hsl(0 63% 18%/.15)}
+.rules-sheet{background:var(--surface);width:100%;max-width:480px;max-height:90vh;border-radius:12px 12px 0 0;display:flex;flex-direction:column;overflow:hidden;border-top:2px solid var(--primary);box-shadow:0 -8px 32px hsl(0 63% 18%/.15)}
 .rules-header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-col);flex-shrink:0}
-.rules-header h2{font-size:1.05rem;color:var(--accent);margin:0;font-family:'Libre Baskerville',serif}
+.rules-header h2{font-size:1.05rem;color:var(--primary);margin:0;font-family:'Libre Baskerville',serif}
 .rules-close{background:var(--surface-dim);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .rules-body{overflow-y:auto;padding:16px 20px 32px;display:flex;flex-direction:column;gap:20px;-webkit-overflow-scrolling:touch}
 .rules-section{display:flex;flex-direction:column;gap:8px}
-.rules-section h3{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin:0;font-weight:700}
+.rules-section h3{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--primary);margin:0;font-weight:700}
 .rules-section p,.rules-section li{font-size:.88rem;color:var(--muted-text);line-height:1.6;margin:0}
 .rules-section ul{padding-left:16px;display:flex;flex-direction:column;gap:4px}
 .rules-section b{color:var(--text)}
@@ -283,7 +283,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .action-notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* Deck pulse when drawn */
-@keyframes deckPulse{0%{transform:scale(1)}40%{transform:scale(1.12);box-shadow:0 0 22px var(--accent)}100%{transform:scale(1);box-shadow:none}}
+@keyframes deckPulse{0%{transform:scale(1)}40%{transform:scale(1.12);box-shadow:0 0 22px var(--primary)}100%{transform:scale(1);box-shadow:none}}
 .anim-deck{animation:deckPulse .38s ease}
 
 /* Discard: new card slides in */
@@ -320,7 +320,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 /* ── Drawn card bottom sheet ── */
 .sheet-bd{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:240;opacity:0;pointer-events:none;transition:opacity .25s}
 .sheet-bd.show{opacity:1;pointer-events:auto}
-.drawn-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(110%);width:100%;max-width:480px;background:var(--surface);border-radius:12px 12px 0 0;padding:18px 16px 30px;z-index:250;display:flex;flex-direction:column;align-items:center;gap:14px;border-top:2px solid var(--accent);transition:transform .34s cubic-bezier(.34,1.15,.64,1);box-shadow:0 -8px 32px hsl(0 63% 18%/.18)}
+.drawn-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(110%);width:100%;max-width:480px;background:var(--surface);border-radius:12px 12px 0 0;padding:18px 16px 30px;z-index:250;display:flex;flex-direction:column;align-items:center;gap:14px;border-top:2px solid var(--primary);transition:transform .34s cubic-bezier(.34,1.15,.64,1);box-shadow:0 -8px 32px hsl(0 63% 18%/.18)}
 .drawn-sheet.open{transform:translateX(-50%) translateY(0)}
 .drawn-sheet-label{font-size:.7rem;color:var(--muted-text);text-transform:uppercase;letter-spacing:1.5px;text-align:center;font-weight:600}
 .drawn-sheet-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
@@ -825,7 +825,7 @@ function renderOpponents(opponents, state) {
     const isSwapInvolved = isSwap && (p.id === pendingAnim.playerId || p.id === state.currentPlayerId);
     const cards = p.cards.map((c,i) => cardHTML(c, { small: true })).join('');
     const extraAnim = isSwapInvolved ? ' anim-row' : (isCur ? ' animate-in' : '');
-    return `<div class="opponent-row${extraAnim}" style="${isCur ? 'border:1px solid var(--accent)' : ''}">
+    return `<div class="opponent-row${extraAnim}" style="${isCur ? 'border:1px solid var(--primary)' : ''}">
       <div class="opponent-name">${isCur ? '▶ ' : ''}${escHtml(p.name)}<span style="color:var(--muted);font-size:.7rem"> (${p.totalScore})</span></div>
       <div class="opponent-cards">${cards}</div>
     </div>`;
