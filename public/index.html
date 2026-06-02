@@ -16,9 +16,19 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#1a1a2e;--surface:#16213e;--card-bg:#0f3460;--card-face:#e94560;
-  --accent:#e94560;--gold:#f5a623;--green:#4caf50;--text:#eee;--muted:#888;
-  --radius:12px;--card-w:60px;--card-h:86px;
+  --bg:#faf7f5;
+  --surface:#fff;
+  --surface-dim:#f0ebe8;
+  --card-bg:#7f1d1d;
+  --accent:#9b2c2c;
+  --gold:#b45309;
+  --green:#15803d;
+  --text:#1a1a1a;
+  --muted-text:#57534e;
+  --border-col:#f5e8d2;
+  --shadow:1px 1px 16px -2px hsl(0 63% 18%/.12);
+  --radius:8px;
+  --card-w:60px;--card-h:86px;
 }
 
 /* ── Design System ── */
@@ -147,7 +157,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
 }
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;overflow:hidden}
 body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh}
 
 /* ── Screens ── */
@@ -155,29 +165,29 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 .screen.active{display:flex}
 
 /* ── Lobby ── */
-h1{font-size:1.8rem;text-align:center;color:var(--gold)}
-h1 span{display:block;font-size:1rem;color:var(--muted);font-weight:normal}
+h1{font-size:1.8rem;text-align:center;color:var(--accent);font-family:'Libre Baskerville',serif}
+h1 span{display:block;font-size:.95rem;color:var(--muted-text);font-weight:400;font-family:'Poppins',sans-serif}
 .input-group{display:flex;flex-direction:column;gap:8px;width:100%}
-label{font-size:.85rem;color:var(--muted)}
-input{background:var(--surface);border:2px solid #333;border-radius:8px;color:var(--text);padding:12px 16px;font-size:1rem;width:100%;outline:none}
+label{font-size:.82rem;color:var(--muted-text);font-weight:600}
+input{background:var(--surface);border:1.5px solid var(--border-col);border-radius:var(--radius);color:var(--text);padding:12px 16px;font-size:1rem;width:100%;outline:none;font-family:'Poppins',sans-serif;box-shadow:var(--shadow)}
 input:focus{border-color:var(--accent)}
 input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
-.btn{width:100%;padding:14px;border:none;border-radius:var(--radius);font-size:1rem;font-weight:700;cursor:pointer;transition:transform .1s,opacity .2s}
+.btn{width:100%;padding:14px;border:none;border-radius:var(--radius);font-size:1rem;font-weight:700;cursor:pointer;transition:transform .1s,opacity .2s;font-family:'Poppins',sans-serif}
 .btn:active{transform:scale(.96)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-secondary{background:var(--surface);color:var(--text);border:2px solid #333}
-.btn-gold{background:var(--gold);color:#111}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:1px 1px 14px -2px hsl(0 63% 18%/.2)}
+.btn-secondary{background:#fdf2d6;color:#805500;border:1.5px solid var(--border-col)}
+.btn-gold{background:var(--gold);color:#fff;box-shadow:var(--shadow)}
 .btn-green{background:var(--green);color:#fff}
 .btn-sm{padding:10px 18px;font-size:.9rem;width:auto}
-.divider{width:100%;text-align:center;color:var(--muted);position:relative}
-.divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:#333}
+.divider{width:100%;text-align:center;color:#d6d3d1;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:40%;height:1px;background:var(--border-col)}
 .divider::before{left:0}.divider::after{right:0}
-.error-msg{color:#ff6b6b;font-size:.85rem;text-align:center;min-height:20px}
-.code-display{font-size:3rem;letter-spacing:8px;color:var(--gold);font-weight:900;text-align:center}
+.error-msg{color:#991b1b;font-size:.85rem;text-align:center;min-height:20px}
+.code-display{font-size:3rem;letter-spacing:8px;color:var(--accent);font-weight:900;text-align:center;font-family:'Libre Baskerville',serif}
 .player-list{width:100%;display:flex;flex-direction:column;gap:8px}
-.player-item{background:var(--surface);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.player-item{background:var(--surface);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;border:1px solid var(--border-col);box-shadow:var(--shadow)}
 .player-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
-.waiting-text{color:var(--muted);font-size:.9rem;text-align:center;animation:pulse 2s infinite}
+.waiting-text{color:var(--muted-text);font-size:.9rem;text-align:center;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* ── Game board ── */
@@ -187,79 +197,79 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 
 /* Opponents area */
 .opponents-area{flex:0 0 auto;padding:6px 8px;display:flex;flex-direction:column;gap:4px;max-height:45vh;overflow-y:auto}
-.opponent-row{background:var(--surface);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px}
-.opponent-name{font-size:.8rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opponent-row{background:var(--surface);border-radius:var(--radius);padding:8px 10px;display:flex;align-items:center;gap:8px;border:1px solid var(--border-col);box-shadow:var(--shadow)}
+.opponent-name{font-size:.8rem;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
 .opponent-cards{display:flex;gap:4px}
 
 /* Center area */
-.center-area{flex:0 0 auto;padding:8px;display:flex;align-items:center;justify-content:space-around;gap:8px;border-top:1px solid #222;border-bottom:1px solid #222}
+.center-area{flex:0 0 auto;padding:10px 8px;display:flex;align-items:center;justify-content:space-around;gap:8px;border-top:1px solid var(--border-col);border-bottom:1px solid var(--border-col);background:#fdf8f5}
 .pile{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
-.pile-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.pile-label{font-size:.65rem;color:var(--muted-text);text-transform:uppercase;letter-spacing:1px;font-weight:600}
 .pile.disabled{opacity:.4;pointer-events:none}
 
 /* Action area */
 .action-area{flex:0 0 auto;padding:6px 8px;min-height:52px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .action-buttons{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .drawn-card-area{display:flex;flex-direction:column;align-items:center;gap:6px}
-.drawn-label{font-size:.75rem;color:var(--muted)}
+.drawn-label{font-size:.75rem;color:var(--muted-text)}
 
 /* Player area */
-.player-area{flex:1;padding:8px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px}
+.player-area{flex:1;padding:8px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;background:var(--bg)}
 .player-name-bar{display:flex;justify-content:space-between;align-items:center}
-.player-name{font-weight:700;font-size:.9rem}
+.player-name{font-weight:700;font-size:.9rem;color:var(--text)}
 .my-cards{display:flex;gap:8px;justify-content:center}
 
 /* Turn indicator */
-.turn-banner{background:var(--accent);text-align:center;padding:6px;font-size:.85rem;font-weight:700;flex:0 0 auto}
+.turn-banner{background:var(--accent);color:#fff;text-align:center;padding:8px;font-size:.85rem;font-weight:700;flex:0 0 auto;font-family:'Poppins',sans-serif}
 .turn-banner.my-turn{background:var(--green)}
 
 /* ── Cards ── */
-.card{width:var(--card-w);height:var(--card-h);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1rem;font-weight:900;cursor:pointer;transition:transform .15s,box-shadow .15s;user-select:none;position:relative;flex-shrink:0}
-.card.face-down{background:var(--card-bg);border:2px solid #1e5a8a;color:#1e5a8a}
-.card.face-down::before{content:'🂠';font-size:1.8rem;color:#2a7ab8}
-.card.face-up{background:#fff;color:#222;border:2px solid #ddd}
-.card.face-up.special{background:var(--surface);color:var(--text);border:2px solid var(--accent)}
-.card.face-up.val-9{background:#ffe0e0;color:#c00}
-.card.face-up.val-0{background:#e0ffe0;color:#060}
-.card.selected{transform:translateY(-8px);box-shadow:0 0 16px var(--gold),0 0 32px rgba(245,166,35,.4)}
+.card{width:var(--card-w);height:var(--card-h);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1rem;font-weight:900;cursor:pointer;transition:transform .15s,box-shadow .15s;user-select:none;position:relative;flex-shrink:0;font-family:'Poppins',sans-serif}
+.card.face-down{background:var(--card-bg);border:2px solid #9b2c2c;color:#fca5a5}
+.card.face-down::before{content:'🂠';font-size:1.8rem;color:#fca5a5}
+.card.face-up{background:#fff;color:var(--text);border:1.5px solid var(--border-col);box-shadow:1px 1px 10px -2px hsl(0 63% 18%/.12)}
+.card.face-up.special{background:#fdf2d6;color:#805500;border:1.5px solid #f5e8d2}
+.card.face-up.val-9{background:#fee2e2;color:#991b1b}
+.card.face-up.val-0{background:#dcfce7;color:#166534}
+.card.selected{transform:translateY(-8px);box-shadow:0 0 16px #b45309,0 0 32px rgba(180,83,9,.3)}
 .card.selectable:hover{transform:translateY(-4px)}
 .card.drawn-preview{width:70px;height:100px;font-size:1.2rem}
 .card-value{font-size:1.4rem;line-height:1}
-.card-sub{font-size:.55rem;font-weight:500;text-align:center;padding:0 2px}
+.card-sub{font-size:.55rem;font-weight:600;text-align:center;padding:0 2px}
 .card.small{width:46px;height:66px}
 .card.small .card-value{font-size:1rem}
 .card.small .card-sub{font-size:.45rem}
 .card.small.face-down::before{font-size:1.3rem}
 
 /* ── Overlay / Modal ── */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
 .overlay.hidden{display:none}
-.modal{background:var(--surface);border-radius:16px;padding:24px;max-width:340px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
-.modal h2{font-size:1.3rem;color:var(--gold)}
-.modal p{color:var(--muted);font-size:.9rem;line-height:1.5}
+.modal{background:var(--surface);border-radius:12px;padding:24px;max-width:340px;width:100%;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;border:1px solid var(--border-col);box-shadow:1px 2px 24px -2px hsl(0 63% 18%/.18)}
+.modal h2{font-size:1.2rem;color:var(--accent);font-family:'Libre Baskerville',serif}
+.modal p{color:var(--muted-text);font-size:.9rem;line-height:1.5}
 .score-table{width:100%;border-collapse:collapse}
-.score-table th,.score-table td{padding:8px 10px;text-align:left;font-size:.9rem;border-bottom:1px solid #333}
-.score-table th{color:var(--muted);font-weight:600}
+.score-table th,.score-table td{padding:8px 10px;text-align:left;font-size:.9rem;border-bottom:1px solid var(--border-col)}
+.score-table th{color:var(--muted-text);font-weight:600}
 .score-table .winner-row td{color:var(--gold);font-weight:700}
 
 /* ── Instructions overlay ── */
 .instruction-text{font-size:.95rem;color:var(--text);line-height:1.6;text-align:left;width:100%}
-.instruction-text b{color:var(--gold)}
+.instruction-text b{color:var(--accent)}
 
 /* ── Rules modal ── */
-.rules-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:0}
+.rules-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:flex-end;justify-content:center;padding:0}
 .rules-overlay.hidden{display:none}
-.rules-sheet{background:#16213e;width:100%;max-width:480px;max-height:90vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;border-top:2px solid rgba(233,69,96,.3)}
-.rules-header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
-.rules-header h2{font-size:1.05rem;color:var(--gold);margin:0}
-.rules-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rules-sheet{background:var(--surface);width:100%;max-width:480px;max-height:90vh;border-radius:12px 12px 0 0;display:flex;flex-direction:column;overflow:hidden;border-top:2px solid var(--accent);box-shadow:0 -8px 32px hsl(0 63% 18%/.15)}
+.rules-header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-col);flex-shrink:0}
+.rules-header h2{font-size:1.05rem;color:var(--accent);margin:0;font-family:'Libre Baskerville',serif}
+.rules-close{background:var(--surface-dim);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .rules-body{overflow-y:auto;padding:16px 20px 32px;display:flex;flex-direction:column;gap:20px;-webkit-overflow-scrolling:touch}
 .rules-section{display:flex;flex-direction:column;gap:8px}
-.rules-section h3{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin:0}
-.rules-section p,.rules-section li{font-size:.88rem;color:#ccc;line-height:1.6;margin:0}
+.rules-section h3{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin:0;font-weight:700}
+.rules-section p,.rules-section li{font-size:.88rem;color:var(--muted-text);line-height:1.6;margin:0}
 .rules-section ul{padding-left:16px;display:flex;flex-direction:column;gap:4px}
-.rules-section b{color:#fff}
-.rules-card-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border-radius:8px;padding:6px 10px;font-size:.85rem;color:#fff}
+.rules-section b{color:var(--text)}
+.rules-card-chip{display:inline-flex;align-items:center;gap:5px;background:#fdf2d6;border:1px solid var(--border-col);border-radius:8px;padding:6px 10px;font-size:.85rem;color:#805500}
 .rules-cards-row{display:flex;flex-wrap:wrap;gap:8px}
 
 /* ── Animations ── */
@@ -269,7 +279,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .bounce-in{animation:bounceIn .4s ease}
 
 /* Action notification */
-.action-notif{position:fixed;top:52px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(15,15,30,.92);color:#fff;padding:7px 18px;border-radius:20px;font-size:.82rem;z-index:400;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap;max-width:88vw;text-align:center;border:1px solid rgba(255,255,255,.12)}
+.action-notif{position:fixed;top:52px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(26,10,10,.88);color:#fdf2d6;padding:7px 18px;border-radius:20px;font-size:.82rem;z-index:400;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap;max-width:88vw;text-align:center;border:1px solid rgba(155,44,44,.35);font-family:'Poppins',sans-serif}
 .action-notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* Deck pulse when drawn */
@@ -281,7 +291,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .anim-discard{animation:discardIn .32s ease}
 
 /* Card swap glow */
-@keyframes swapGlow{0%,100%{box-shadow:none}50%{box-shadow:0 0 18px #4caf50,0 0 36px rgba(76,175,80,.35);transform:scale(1.08)}}
+@keyframes swapGlow{0%,100%{box-shadow:none}50%{box-shadow:0 0 18px #15803d,0 0 36px rgba(21,128,61,.3);transform:scale(1.08)}}
 .anim-swap{animation:swapGlow .5s ease}
 
 /* End-of-round card reveal (flip) */
@@ -293,7 +303,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .anim-banner{animation:bannerIn .25s ease}
 
 /* Opponent row highlight on their turn */
-@keyframes rowPop{0%,100%{background:var(--surface)}50%{background:rgba(233,69,96,.18)}}
+@keyframes rowPop{0%,100%{background:var(--surface)}50%{background:rgba(155,44,44,.08)}}
 .anim-row{animation:rowPop .45s ease}
 
 @media(prefers-reduced-motion:reduce){
@@ -301,18 +311,18 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 }
 
 /* ── Swap target highlight ── */
-.card.swap-target{box-shadow:0 0 14px #4caf50,0 0 28px rgba(76,175,80,.3);border-color:#4caf50}
-.card.swap-source{box-shadow:0 0 14px var(--gold);border-color:var(--gold)}
+.card.swap-target{box-shadow:0 0 14px #15803d,0 0 28px rgba(21,128,61,.25);border-color:#15803d}
+.card.swap-source{box-shadow:0 0 14px #b45309;border-color:#b45309}
 
 /* ── Status message ── */
-.status-msg{font-size:.8rem;color:var(--muted);text-align:center;min-height:18px;padding:0 8px}
+.status-msg{font-size:.8rem;color:var(--muted-text);text-align:center;min-height:18px;padding:0 8px}
 
 /* ── Drawn card bottom sheet ── */
 .sheet-bd{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:240;opacity:0;pointer-events:none;transition:opacity .25s}
 .sheet-bd.show{opacity:1;pointer-events:auto}
-.drawn-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(110%);width:100%;max-width:480px;background:#16213e;border-radius:20px 20px 0 0;padding:18px 16px 30px;z-index:250;display:flex;flex-direction:column;align-items:center;gap:14px;border-top:2px solid rgba(233,69,96,.4);transition:transform .34s cubic-bezier(.34,1.15,.64,1);box-shadow:0 -12px 48px rgba(0,0,0,.7)}
+.drawn-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(110%);width:100%;max-width:480px;background:var(--surface);border-radius:12px 12px 0 0;padding:18px 16px 30px;z-index:250;display:flex;flex-direction:column;align-items:center;gap:14px;border-top:2px solid var(--accent);transition:transform .34s cubic-bezier(.34,1.15,.64,1);box-shadow:0 -8px 32px hsl(0 63% 18%/.18)}
 .drawn-sheet.open{transform:translateX(-50%) translateY(0)}
-.drawn-sheet-label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;text-align:center}
+.drawn-sheet-label{font-size:.7rem;color:var(--muted-text);text-transform:uppercase;letter-spacing:1.5px;text-align:center;font-weight:600}
 .drawn-sheet-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
 .drawn-sheet-hint{font-size:.85rem;color:var(--text);text-align:center;padding:4px 0}
 .card.card-xl{width:80px;height:116px}
@@ -321,8 +331,8 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
 .card.card-xl.face-down::before{font-size:2.2rem}
 
 /* ── Flying card ── */
-.card-fly{position:fixed;z-index:500;pointer-events:none;border-radius:8px;background:var(--card-bg);border:2px solid #1e5a8a;display:flex;align-items:center;justify-content:center}
-.card-fly::before{content:'🂠';font-size:1.8rem;color:#2a7ab8}
+.card-fly{position:fixed;z-index:500;pointer-events:none;border-radius:8px;background:#7f1d1d;border:2px solid #9b2c2c;display:flex;align-items:center;justify-content:center}
+.card-fly::before{content:'🂠';font-size:1.8rem;color:#fca5a5}
 
 /* ── Cards pulsing for selection ── */
 @keyframes selectPulse{0%,100%{transform:translateY(0);box-shadow:none}50%{transform:translateY(-7px);box-shadow:0 0 16px var(--gold),0 0 32px rgba(245,166,35,.3)}}
@@ -377,14 +387,14 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
   <div class="game-layout">
     <div style="display:flex;align-items:stretch">
       <div class="turn-banner" id="turn-banner" style="flex:1">Σειρά: —</div>
-      <button id="btn-exit" title="Έξοδος" style="background:#333;border:none;color:#aaa;font-size:.75rem;padding:0 12px;cursor:pointer;flex-shrink:0;border-left:1px solid #222">✕ Έξοδος</button>
+      <button id="btn-exit" title="Έξοδος" style="background:var(--surface-dim);border:none;border-left:1px solid var(--border-col);color:var(--muted-text);font-size:.75rem;padding:0 12px;cursor:pointer;flex-shrink:0;font-family:'Poppins',sans-serif;font-weight:600">✕ Έξοδος</button>
     </div>
     <div class="opponents-area" id="opponents-area"></div>
     <div class="center-area">
       <div class="pile" id="deck-pile" title="Πάρε από Στοίβα">
         <div class="pile-label">Στοίβα</div>
         <div class="card face-down" id="deck-card"></div>
-        <div style="font-size:.75rem;color:var(--muted)" id="deck-count">—</div>
+        <div style="font-size:.65rem;color:var(--muted-text);font-weight:600" id="deck-count">—</div>
       </div>
       <div class="pile" id="discard-pile" title="Πάρε από Σκάρτα">
         <div class="pile-label">Σκάρτα</div>
@@ -398,7 +408,7 @@ input[type=number]{letter-spacing:4px;font-size:1.4rem;text-align:center}
     <div class="player-area">
       <div class="player-name-bar">
         <div class="player-name" id="my-name-label">Εσύ</div>
-        <div style="font-size:.75rem;color:var(--muted)" id="my-score-label">Σκορ: 0</div>
+        <div style="font-size:.75rem;color:var(--muted-text);font-weight:600" id="my-score-label">Σκορ: 0</div>
       </div>
       <div class="my-cards" id="my-cards"></div>
     </div>
